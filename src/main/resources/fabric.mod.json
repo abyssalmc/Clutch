@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "clutch",
+	"version": "${version}",
+	"name": "clutch",
+	"description": "Competitive clutching utils.",
+	"authors": [
+		"AbyssalMC"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/clutch/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"abyssalmc.clutch.Clutch"
+		],
+		"fabric-datagen": [
+			"abyssalmc.clutch.ClutchDataGenerator"
+		],
+		"client": [
+			"abyssalmc.clutch.ClutchClient"
+		]
+	},
+	"mixins": [
+		"clutch.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
