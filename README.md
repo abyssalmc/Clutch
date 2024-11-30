@@ -1,4 +1,6 @@
-**Did you know that at certain heights it is impossible to clutch?**
+
+# Clutch by AbyssalMC
+### **Did you know that at certain heights it is impossible to clutch?**
 
 This mod shows whether it is possible to block ladder clutch (bladder) and boat clutch. It also contains many quality of life competitive clutching features.
 
@@ -19,9 +21,12 @@ This mod shows whether it is possible to block ladder clutch (bladder) and boat 
 - Pressing the reset hotkey also works in guis unlike standard auto text hotkeys
 - Positioned farther forward for faster resets than /kill
 - The pitch by default is set to 77.0 degrees, but this can be changed through /pitch [angle] which is stored locally.
-- Automatic movement can also be enabled through /automov enable, which makes the player move backwards and jump automatically when reset.
+- Automatic movement can also be enabled through /automov enable, which makes the player move backwards and jump when reset.
 
 **Cursor offset**
 - There is a way to offset your cursor in GUIs from its original position in the center of the screen (960,540)
 - However it is tedious to set up after each attempt, so this mod replicates it exactly to save time
 - This can be done with /cursoroffset [cursorX] [cursorY], and can be disabled using /disableoffset
+
+![mod icon](https://cdn.modrinth.com/data/cached_images/74b2a2f95183019fcc775191ff24e749ef464790.png)
+
