@@ -53,7 +53,7 @@ public class Clutch implements ModInitializer {
 		Vec3d lookVector = player.getRotationVec(1.0F);
 		Vec3d endVec = eyePosition.add(lookVector.multiply(maxDistance));
 
-		// Perform the raycast
+		//raycast
 		BlockHitResult hitResult = world.raycast(new RaycastContext(
 				eyePosition,
 				endVec,
@@ -277,10 +277,6 @@ public class Clutch implements ModInitializer {
 
 				if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(arrow, 10, floor(49*mc.getWindow().getHeight()/216)-1, 0, 0, 24, 24, 24, 24);}
 				if (boatcrouch && boattot>=1){drawContext.drawTexture(arrow, 40, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
-				//if (hayv == 0){drawContext.drawTexture(hay0, 58, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
-				//if (hayv == 1){drawContext.drawTexture(hay1, 58, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
-				//if (hayv == 2){drawContext.drawTexture(hay2, 58, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
-				//if (hayv == 3){drawContext.drawTexture(hay3, 58, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
 			}
 		});
 
