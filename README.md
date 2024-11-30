@@ -1,6 +1,7 @@
 
 # Clutch by AbyssalMC
 ### **Did you know that at certain heights it is impossible to clutch?**
+https://modrinth.com/mod/clutch
 
 This mod shows whether it is possible to block ladder clutch (bladder) and boat clutch. It also contains many quality of life competitive clutching features.
 
