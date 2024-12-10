@@ -36,6 +36,4 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
             persistentData = nbt.getCompound("clutch.platform_data");
         }
     }
-
-
 }

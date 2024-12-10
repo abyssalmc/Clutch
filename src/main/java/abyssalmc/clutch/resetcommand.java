@@ -35,6 +35,10 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("disableoffset").executes(resetcommand::disableOffset));
 
         dispatcher.register(CommandManager.literal("pitch").then(CommandManager.argument("angle", IntegerArgumentType.integer()).executes(resetcommand::setpitch)));
+
+        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("default").executes(resetcommand::rbn)));
+        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("disable").executes(resetcommand::rbd)));
+        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("occlude").executes(resetcommand::rbo)));
     }
 
 
@@ -156,6 +160,33 @@ public class resetcommand {
 
         GlobalDataHandler.setPitch(IntegerArgumentType.getInteger(context, "angle"));
         p.sendMessage(Text.literal("Reset pitch updated to §a" + IntegerArgumentType.getInteger(context, "angle") + "§r."));
+
+        return 1;
+    }
+
+    private static int rbn(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setRecipe(0);
+        p.sendMessage(Text.literal("§aRecipe book mode set to default."));
+
+        return 1;
+    }
+
+    private static int rbd(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setRecipe(1);
+        p.sendMessage(Text.literal("§aRecipe book mode set to disabled."));
+
+        return 1;
+    }
+
+    private static int rbo(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setRecipe(2);
+        p.sendMessage(Text.literal("§aRecipe book mode set to occluded."));
 
         return 1;
     }

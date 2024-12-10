@@ -3,7 +3,7 @@
 	"package": "abyssalmc.clutch.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"CursorOffset", "ModEntityDataSaver"
+		"CursorOffset", "ModEntityDataSaver", "RecipeDisabler"
 	],
 	"injectors": {
 		"defaultRequire": 1

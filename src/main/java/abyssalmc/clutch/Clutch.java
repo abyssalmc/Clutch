@@ -4,10 +4,16 @@ import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -251,7 +257,16 @@ public class Clutch implements ModInitializer {
 		});
 
 
-
+		ScreenEvents.AFTER_INIT.register((MinecraftClient client, Screen screen, int w, int h) -> {
+			if (screen instanceof CraftingScreen && GlobalDataHandler.getRecipe() > 0){
+				for (Element element : screen.children()) {
+					if (GlobalDataHandler.getRecipe() > 1 && element instanceof ButtonWidget button){
+						button.visible = false;
+					}
+					screen.children().remove(element);
+				}
+			}
+		});
 
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
 			if (showclutch){
