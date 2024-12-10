@@ -13,6 +13,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -28,6 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import abyssalmc.clutch.event.keyinputhandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static abyssalmc.clutch.event.keyinputhandler.*;
 import static net.minecraft.util.math.MathHelper.floor;
@@ -53,6 +57,14 @@ public class Clutch implements ModInitializer {
 	public static boolean bladdercrouch = false;
 	public static boolean boatcrouch = false;
 
+	public static int automovementcountdown = 0;
+
+	public static final Identifier PLATFORM_POS = Identifier.of(MOD_ID, "platform_pos");
+
+	private double lastTickTime = 0;
+	public static List<Double> tickavg = new ArrayList<>(){};
+
+	public static boolean isTas = false;
 
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
@@ -90,12 +102,33 @@ public class Clutch implements ModInitializer {
 	Identifier boat4 = Identifier.of(Clutch.MOD_ID, "textures/boat4.png");
 	Identifier arrow = Identifier.of(Clutch.MOD_ID, "textures/arrow.png");
 
-	public static int automovementcountdown = 0;
-
-	public static final Identifier PLATFORM_POS = Identifier.of(MOD_ID, "platform_pos");
-
 	private boolean isKeyPressed(int key) {
 		return GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), key) == GLFW.GLFW_PRESS;
+	}
+
+	public static double calculateAverage(List<Double> doubleList) {
+		if (doubleList.isEmpty()) {
+			throw new IllegalArgumentException("List is empty, cannot calculate average.");
+		}
+
+		double sum = 0;
+		for (double num : doubleList) {
+			sum += num;
+		}
+
+		return sum / doubleList.size();
+	}
+
+	public static double thresholdTest(List<Double> doubleList) {
+		if (doubleList.isEmpty()) {
+			throw new IllegalArgumentException("List is empty, cannot calculate average.");
+		}
+		double flag = 0;
+		for (double num : doubleList) {
+			if (num > 50)
+				flag++;
+		}
+		return flag;
 	}
 
 	@Override
@@ -114,6 +147,24 @@ public class Clutch implements ModInitializer {
 			PlayerEntity p = mc.player;
 
 			if (p != null) {
+				//INDICATOR
+				double currentTime = System.currentTimeMillis();
+				if (lastTickTime != 0) {
+					if (tickavg != null){
+						double tickDuration = currentTime - lastTickTime;
+						if (!(tickavg.size() < 10)) {
+							tickavg.remove(0);
+						}
+						tickavg.add(tickDuration);
+						if (calculateAverage(tickavg) >= 54 && thresholdTest(tickavg) > 4){
+							isTas = true;
+						} else {
+							isTas = false;
+						}
+					}
+				}
+				lastTickTime = currentTime;
+
 				//AUTO MOVEMENT
 				StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
 				if (GlobalDataHandler.getAutomov() && !serverState.platformcoords.equals("unset")){
@@ -258,7 +309,7 @@ public class Clutch implements ModInitializer {
 
 
 		ScreenEvents.AFTER_INIT.register((MinecraftClient client, Screen screen, int w, int h) -> {
-			if (screen instanceof CraftingScreen && GlobalDataHandler.getRecipe() > 0){
+			if ((screen instanceof CraftingScreen || (screen instanceof InventoryScreen && !client.player.isInCreativeMode())) && GlobalDataHandler.getRecipe() > 0){
 				for (Element element : screen.children()) {
 					if (GlobalDataHandler.getRecipe() > 1 && element instanceof ButtonWidget button){
 						button.visible = false;
@@ -271,27 +322,27 @@ public class Clutch implements ModInitializer {
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
 			if (showclutch){
 				TextRenderer textRenderer = mc.textRenderer;
-				drawContext.drawTexture(bladder, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);
-				drawContext.drawTexture(boat, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);
+				drawContext.drawTexture(bladder, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
+				drawContext.drawTexture(boat, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
 
 				int bladdertot = 0;
 				int boattot = 0;
 
-				if (bladderv == 0){drawContext.drawTexture(bladder0, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 1){drawContext.drawTexture(bladder1, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 2){drawContext.drawTexture(bladder2, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 3){drawContext.drawTexture(bladder3, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 4){drawContext.drawTexture(bladder4, 4, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 0){drawContext.drawTexture(bladder0, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 1){drawContext.drawTexture(bladder1, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 2){drawContext.drawTexture(bladder2, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 3){drawContext.drawTexture(bladder3, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 4){drawContext.drawTexture(bladder4, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
 
-				if (boatv == 0){drawContext.drawTexture(boat0, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 1){drawContext.drawTexture(boat1, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 2){drawContext.drawTexture(boat2, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 3){drawContext.drawTexture(boat3, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 4){drawContext.drawTexture(boat4, 31, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 0){drawContext.drawTexture(boat0, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 1){drawContext.drawTexture(boat1, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 2){drawContext.drawTexture(boat2, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 3){drawContext.drawTexture(boat3, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 4){drawContext.drawTexture(boat4, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
 
 
-				if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(arrow, 10, floor(49*mc.getWindow().getHeight()/216)-1, 0, 0, 24, 24, 24, 24);}
-				if (boatcrouch && boattot>=1){drawContext.drawTexture(arrow, 40, floor(49*mc.getWindow().getHeight()/216), 0, 0, 24, 24, 24, 24);}
+				if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(arrow, 10, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
+				if (boatcrouch && boattot>=1){drawContext.drawTexture(arrow, 40, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
 			}
 		});
 
