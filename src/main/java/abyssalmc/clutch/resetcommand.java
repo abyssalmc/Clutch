@@ -39,6 +39,10 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("default").executes(resetcommand::rbn)));
         dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("disable").executes(resetcommand::rbd)));
         dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("occlude").executes(resetcommand::rbo)));
+
+        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(resetcommand::ilo)));
+        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(resetcommand::ilm)));
+        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(resetcommand::ilf)));
     }
 
 
@@ -191,5 +195,30 @@ public class resetcommand {
         return 1;
     }
 
+    private static int ilo(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
 
+        GlobalDataHandler.setInputlocation(0);
+        p.sendMessage(Text.literal("§aInput location utils will not be displayed."));
+
+        return 1;
+    }
+
+    private static int ilm(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setInputlocation(1);
+        p.sendMessage(Text.literal("§aInput location utils will be displayed on misses."));
+
+        return 1;
+    }
+
+    private static int ilf(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setInputlocation(2);
+        p.sendMessage(Text.literal("§aInput location utils will always be displayed."));
+
+        return 1;
+    }
 }

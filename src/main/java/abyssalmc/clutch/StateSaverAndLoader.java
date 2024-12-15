@@ -32,13 +32,14 @@ public class StateSaverAndLoader extends PersistentState {
     );
 
     public static StateSaverAndLoader getServerState(MinecraftServer server) {
-        PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
+        if (server != null){
+            PersistentStateManager persistentStateManager = server.getWorld(World.OVERWORLD).getPersistentStateManager();
 
-        StateSaverAndLoader state = persistentStateManager.getOrCreate(type, Clutch.MOD_ID);
+            StateSaverAndLoader state = persistentStateManager.getOrCreate(type, Clutch.MOD_ID);
 
-        state.markDirty();
-
-        return state;
+            state.markDirty();
+            return state;
+        }
+        return null;
     }
-
 }

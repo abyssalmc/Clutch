@@ -66,6 +66,17 @@ public class Clutch implements ModInitializer {
 
 	public static boolean isTas = false;
 
+	public static List<Integer> cxcoords = new ArrayList<>();
+	public static List<Integer> cycoords = new ArrayList<>();
+
+	public static boolean keypressed = false;
+	public static boolean mousepressed = false;
+
+	public static int lastmousex = 0;
+	public static int lastmousey = 0;
+
+
+
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
 		Vec3d lookVector = player.getRotationVec(1.0F);
@@ -166,43 +177,53 @@ public class Clutch implements ModInitializer {
 				lastTickTime = currentTime;
 
 				//AUTO MOVEMENT
-				StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-				if (GlobalDataHandler.getAutomov() && !serverState.platformcoords.equals("unset")){
-					if (automovementcountdown > 0){
-						if (automovementcountdown < 15){
-							if (automovementcountdown == 14){
-								p.setVelocity(p.getVelocity().getX(),0.42,p.getVelocity().getZ());
-								client.options.jumpKey.setPressed(true);
+				if (client.isIntegratedServerRunning() && client.getServer() != null){
+					StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+					if (GlobalDataHandler.getAutomov() && !serverState.platformcoords.equals("unset")){
+						if (automovementcountdown > 0){
+							if (automovementcountdown < 15){
+								if (automovementcountdown == 14){
+									p.setVelocity(p.getVelocity().getX(),0.42,p.getVelocity().getZ());
+									client.options.jumpKey.setPressed(true);
+								}
+								if (client.currentScreen == null) {client.options.backKey.setPressed(true);}
+								if (automovementcountdown == 1){
+									client.options.backKey.setPressed(false);
+									client.options.jumpKey.setPressed(false);
+								}
 							}
-							if (client.currentScreen == null) {client.options.backKey.setPressed(true);}
-							if (automovementcountdown == 1){
-								client.options.backKey.setPressed(false);
-								client.options.jumpKey.setPressed(false);
-							}
+							automovementcountdown--;
 						}
-						automovementcountdown--;
 					}
 				}
 
-				//platform
-				if (client.currentScreen != null) {
-					// CLOSING WITH HOTKEY
-					if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
-						client.currentScreen.close();
 
-						automovementcountdown = 14;
-						if (GlobalDataHandler.getAutomov()){
-							client.options.jumpKey.setPressed(false);
-							client.options.backKey.setPressed(false);
-						}
+				//INPUT LOC
+				if (client.currentScreen == null){
+					cxcoords = new ArrayList<>();
+					cycoords = new ArrayList<>();
+				}
 
+				//PLATFORM
+				if (client.isIntegratedServerRunning() && client.getServer() != null) {
+					if (client.currentScreen != null) {
+						// CLOSING WITH HOTKEY
+						if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
+							client.currentScreen.close();
 
-						if (!serverState.platformcoords.equals("unset")){
-							String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-							client.getNetworkHandler().sendChatCommand(cmd);
-						}
-						else {
-							p.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+							automovementcountdown = 14;
+							if (GlobalDataHandler.getAutomov()) {
+								client.options.jumpKey.setPressed(false);
+								client.options.backKey.setPressed(false);
+							}
+
+							StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+							if (!serverState.platformcoords.equals("unset")) {
+								String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+								client.getNetworkHandler().sendChatCommand(cmd);
+							} else {
+								p.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+							}
 						}
 					}
 				}
