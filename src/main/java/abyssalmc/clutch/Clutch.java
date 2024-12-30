@@ -69,11 +69,23 @@ public class Clutch implements ModInitializer {
 	public static List<Integer> cxcoords = new ArrayList<>();
 	public static List<Integer> cycoords = new ArrayList<>();
 
+	public static List<Integer> ncxcoords = new ArrayList<>();
+	public static List<Integer> ncycoords = new ArrayList<>();
+
+
+	public static List<Integer> ocxcoords = new ArrayList<>();
+	public static List<Integer> ocycoords = new ArrayList<>();
+
 	public static boolean keypressed = false;
 	public static boolean mousepressed = false;
 
 	public static int lastmousex = 0;
 	public static int lastmousey = 0;
+	public static int formermousex = 0;
+	public static int formermousey = 0;
+
+	public static double ct = 0;
+	public static double et = 0;
 
 
 
@@ -158,6 +170,7 @@ public class Clutch implements ModInitializer {
 			PlayerEntity p = mc.player;
 
 			if (p != null) {
+
 				//INDICATOR
 				double currentTime = System.currentTimeMillis();
 				if (lastTickTime != 0) {
@@ -202,6 +215,11 @@ public class Clutch implements ModInitializer {
 				if (client.currentScreen == null){
 					cxcoords = new ArrayList<>();
 					cycoords = new ArrayList<>();
+					ncxcoords = new ArrayList<>();
+					ncycoords = new ArrayList<>();
+
+					ocxcoords = new ArrayList<>();
+					ocycoords = new ArrayList<>();
 				}
 
 				//PLATFORM

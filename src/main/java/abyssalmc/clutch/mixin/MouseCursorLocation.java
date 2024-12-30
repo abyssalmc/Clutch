@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static abyssalmc.clutch.Clutch.*;
 
@@ -32,9 +34,10 @@ public abstract class MouseCursorLocation{
     @Shadow
     protected int y;
 
+
     @Shadow
-    @Nullable
-    private Slot touchDragSlotStart;
+    @Final
+    protected Set<Slot> cursorDragSlots;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -43,19 +46,30 @@ public abstract class MouseCursorLocation{
         if (client.player != null && client.currentScreen != null) {
 
 
+
+
             // click between frames
 
+            /*List<int[]> line = LineUtils.getLine(mouseX, mouseY, lastmousex, lastmousey);
+            //List<int[]> line = LineUtils.getBezierCurve(formermousex,formermousey,lastmousex,lastmousey,mouseX,mouseY);
+            int i = 0;
+            for (int[] coord : line) {
+                context.drawText(client.textRenderer, "·", coord[0], coord[1]-3,  0xFF0000, true);
+                i++;
+            }*/
 
-            if (touchDragSlotStart != null) {
-                client.player.sendMessage(Text.literal(touchDragSlotStart.getIndex() + ""));
+
+                //cursorDragSlots.add(findCustomSlot(27));
+                double frametime = System.currentTimeMillis() - ct;
+                double latency = System.currentTimeMillis() - et;
+
+
 
                 List<Integer> missedslots = new ArrayList<>();
-                List<int[]> line = LineUtils.getLine(mouseX, mouseY, lastmousex, lastmousey);
                 int i = 0;
-                for (int[] coord : line) {
-                    context.drawText(client.textRenderer, "·", coord[0], coord[1]-3,  0xFF0000, false);
-                    i++;
+                List<int[]> line = LineUtils.getLine(mouseX, mouseY, lastmousex, lastmousey);
 
+                for (int[] coord : line) {
                     for (Slot slot : ((HandledScreen) client.currentScreen).getScreenHandler().slots) {
                         int slotX = x + slot.x; // Absolute X position of the slot
                         int slotY = y + slot.y; // Absolute Y position of the slot
@@ -68,25 +82,25 @@ public abstract class MouseCursorLocation{
                             }
                         }
                     }
+                    i++;
                 }
+
                 missedslots = missedslots.reversed();
 
                 String ms = "Missed slots: ";
-                for (int ii : missedslots){
-                    ms = ms + ii + ", ";
+                for (int iii : missedslots){
+                    ms = ms + iii + ", ";
 
                     ItemStack cursorStack = ((HandledScreen) client.currentScreen).getScreenHandler().getCursorStack();
                     ItemStack distributedStack = new ItemStack(cursorStack.getItem(), 1);
-                    ((HandledScreen) client.currentScreen).getScreenHandler().slots.get(ii).setStack(distributedStack);
-
-
+                    //((HandledScreen) client.currentScreen).getScreenHandler().slots.get(iii).setStack(distributedStack);
 
                 }
                 //client.player.sendMessage(Text.literal(ms));
-            }
 
-            lastmousex = mouseX;
-            lastmousey = mouseY;
+
+
+
 
 
             // drawing input locators
@@ -94,11 +108,30 @@ public abstract class MouseCursorLocation{
                 int index = 0;
                 for (int x : cxcoords){
                     RenderSystem.disableDepthTest();
-                    context.drawText(client.textRenderer, "·", x, cycoords.get(index)-3,  0xFF0000, false);
+                    //context.drawText(client.textRenderer, "·", x, cycoords.get(index)-3,  0xFF0000, true);
                     RenderSystem.enableDepthTest();
                     index++;
-
                 }
+                if (!ncxcoords.isEmpty()){
+                    int index2 = 0;
+                    for (int x : ncxcoords){
+                        RenderSystem.disableDepthTest();
+                        //context.drawText(client.textRenderer, "·", x, ncycoords.get(index2)-3,  0x00FF00, true);
+                        RenderSystem.enableDepthTest();
+                        index2++;
+                    }
+                }
+                if (!ocxcoords.isEmpty()){
+                    int index3 = 0;
+                    for (int x : ocxcoords){
+                        RenderSystem.disableDepthTest();
+                        context.drawText(client.textRenderer, "·", x, ocycoords.get(index3)-3,  0x0000FF, true);
+                        RenderSystem.enableDepthTest();
+                        index3++;
+                    }
+                }
+
+
 
                 int overslot = 0;
                 for (Slot slot : ((HandledScreen) client.currentScreen).getScreenHandler().slots) {
@@ -116,10 +149,27 @@ public abstract class MouseCursorLocation{
                     if (keypressed || mousepressed) {
                         keypressed = false;
                         mousepressed = false;
-                        cxcoords.add((int) Math.floor(mouseX));
-                        cycoords.add((int) Math.floor(mouseY));
+                        cxcoords.add(mouseX);
+                        cycoords.add(mouseY);
+
+
+                        double weight = 1-latency/frametime;
+                        ncxcoords.add((int) Math.round(lastmousex+weight*(mouseX-lastmousex)));
+                        ncycoords.add((int) Math.round(lastmousey+weight*(mouseY-lastmousey)));
+
+                        client.player.sendMessage(Text.literal("latency: " + latency + ", frametime: " + frametime));
+                        System.out.println("("+mouseX+","+mouseY+"), ("+((int)Math.round(lastmousex+weight*(mouseX-lastmousex)))+","+((int) Math.round(lastmousey+weight*(mouseY-lastmousey)))+")");
+
+                        //MinecraftClient.getInstance().player.sendMessage(Text.literal((System.currentTimeMillis()-ct)+" / " + frametime));
                     }
                 } else { keypressed = false; mousepressed = false; }
+
+
+                ct = System.currentTimeMillis();
+                formermousex = lastmousex;
+                formermousey = lastmousey;
+                lastmousex = mouseX;
+                lastmousey = mouseY;
             }
 
         }
@@ -134,5 +184,12 @@ public abstract class MouseCursorLocation{
             }
 
         }
+    }
+
+    private Slot findCustomSlot(int slotId) {
+        return MinecraftClient.getInstance().player.currentScreenHandler.slots.stream()
+                .filter(slot -> slot.id == slotId)
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -40,9 +40,9 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("disable").executes(resetcommand::rbd)));
         dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("occlude").executes(resetcommand::rbo)));
 
-        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(resetcommand::ilo)));
-        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(resetcommand::ilm)));
-        //dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(resetcommand::ilf)));
+        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(resetcommand::ilo)));
+        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(resetcommand::ilm)));
+        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(resetcommand::ilf)));
     }
 
 

@@ -31,4 +31,26 @@ public class LineUtils {
 
         return line;
     }
+
+    public static List<int[]> getBezierCurve(int x1, int y1, int x2, int y2, int x3, int y3) {
+        List<int[]> bezierCoords = new ArrayList<>();
+
+        // Number of steps for smoothness (higher = smoother)
+        int steps = 100;
+
+        for (int i = 0; i <= steps; i++) {
+            // Compute t in range [0, 1]
+            double t = i / (double) steps;
+
+            // Quadratic Bézier curve formula
+            double x = (1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * x2 + t * t * x3;
+            double y = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * y2 + t * t * y3;
+
+            // Add rounded coordinates to the list
+            bezierCoords.add(new int[]{(int) Math.round(x), (int) Math.round(y)});
+        }
+
+        return bezierCoords;
+    }
+
 }
