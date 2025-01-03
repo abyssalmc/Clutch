@@ -7,15 +7,23 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -84,8 +92,14 @@ public class Clutch implements ModInitializer {
 	public static int formermousex = 0;
 	public static int formermousey = 0;
 
-	public static double ct = 0;
-	public static double et = 0;
+	public static long ct = 0;
+	public static long et = 0;
+
+	public static int guix = 0;
+	public static int guiy = 0;
+
+	public static int hotbarcraft = 0;
+
 
 
 
@@ -154,6 +168,9 @@ public class Clutch implements ModInitializer {
 		return flag;
 	}
 
+	public static final Identifier UPDATE_SLOTS_PACKET_ID =  Identifier.of(MOD_ID, "update_slots");
+
+
 	@Override
 	public void onInitialize() {
 		GlobalDataHandler.loadGlobalData();
@@ -165,6 +182,28 @@ public class Clutch implements ModInitializer {
 
 		configured = false;
 		MinecraftClient mc = MinecraftClient.getInstance();
+
+		PayloadTypeRegistry.playC2S().register(CraftItemPayload.ID, CraftItemPayload.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(CraftItemPayload.ID, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayerEntity sp = context.server().getPlayerManager().getPlayer(mc.player.getUuid());
+				sp.getInventory().setStack(hotbarcraft,sp.currentScreenHandler.slots.get(0).getStack());
+
+				for (int i = 1; i <= 9; i++) {
+					if (!sp.currentScreenHandler.slots.get(i).getStack().getName().getString().equals("Air")){
+						ItemStack newStack = (sp.currentScreenHandler.slots.get(i).getStack().getCount() == 1) ? new ItemStack(Items.AIR,0) : new ItemStack(sp.currentScreenHandler.slots.get(i).getStack().getItem(),sp.currentScreenHandler.slots.get(i).getStack().getCount()-1);
+						sp.currentScreenHandler.slots.get(i).setStack(newStack);
+					}
+				}
+
+				sp.currentScreenHandler.sendContentUpdates();
+				sp.playerScreenHandler.sendContentUpdates();
+
+				sp.getInventory().markDirty();
+			});
+		});
+
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			PlayerEntity p = mc.player;
@@ -386,4 +425,5 @@ public class Clutch implements ModInitializer {
 		});
 
 	}
+
 }

@@ -31,10 +31,10 @@ public class InputRedirector {
             ocxcoords.add((int) mouseX);
             ocycoords.add((int) mouseY);
 
-            MinecraftClient.getInstance().player.sendMessage(Text.literal("x: " + mouseX + ", y: " + mouseY));
+            //MinecraftClient.getInstance().player.sendMessage(Text.literal("x: " + mouseX + ", y: " + mouseY));
 
 
-            System.out.println("(" + mouseX + "," + mouseY + ")");
+            //System.out.println("(" + mouseX + "," + mouseY + ")");
             cir.setReturnValue(MinecraftClient.getInstance().currentScreen.mouseClicked(mouseX,mouseY,button));
             cir.cancel();
         }

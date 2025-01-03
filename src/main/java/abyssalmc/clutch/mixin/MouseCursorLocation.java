@@ -13,6 +13,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,10 +35,15 @@ public abstract class MouseCursorLocation{
     @Shadow
     protected int y;
 
+    @Shadow
+    private Slot touchDragSlotStart;
+
 
     @Shadow
     @Final
     protected Set<Slot> cursorDragSlots;
+
+    private boolean isDragging = false;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -47,6 +53,9 @@ public abstract class MouseCursorLocation{
 
 
 
+
+            guix = x;
+            guiy = y;
 
             // click between frames
 
@@ -87,17 +96,15 @@ public abstract class MouseCursorLocation{
 
                 missedslots = missedslots.reversed();
 
-                String ms = "Missed slots: ";
-                for (int iii : missedslots){
-                    ms = ms + iii + ", ";
+            cursorDragSlots.add(((HandledScreen)client.currentScreen).getScreenHandler().getSlot(1));
 
-                    ItemStack cursorStack = ((HandledScreen) client.currentScreen).getScreenHandler().getCursorStack();
-                    ItemStack distributedStack = new ItemStack(cursorStack.getItem(), 1);
-                    //((HandledScreen) client.currentScreen).getScreenHandler().slots.get(iii).setStack(distributedStack);
-
+            if (GLFW.glfwGetMouseButton(client.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || GLFW.glfwGetMouseButton(client.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_2) == GLFW.GLFW_PRESS) {
+                if (missedslots.size() >= 2){
+                    isDragging = true;
                 }
-                //client.player.sendMessage(Text.literal(ms));
-
+            } else {
+                isDragging = false;
+            }
 
 
 
@@ -108,7 +115,7 @@ public abstract class MouseCursorLocation{
                 int index = 0;
                 for (int x : cxcoords){
                     RenderSystem.disableDepthTest();
-                    //context.drawText(client.textRenderer, "·", x, cycoords.get(index)-3,  0xFF0000, true);
+                    context.drawText(client.textRenderer, "·", x, cycoords.get(index)-3,  0xFF0000, true);
                     RenderSystem.enableDepthTest();
                     index++;
                 }
@@ -116,7 +123,7 @@ public abstract class MouseCursorLocation{
                     int index2 = 0;
                     for (int x : ncxcoords){
                         RenderSystem.disableDepthTest();
-                        //context.drawText(client.textRenderer, "·", x, ncycoords.get(index2)-3,  0x00FF00, true);
+                        context.drawText(client.textRenderer, "·", x, ncycoords.get(index2)-3,  0x00FF00, true);
                         RenderSystem.enableDepthTest();
                         index2++;
                     }
@@ -157,8 +164,8 @@ public abstract class MouseCursorLocation{
                         ncxcoords.add((int) Math.round(lastmousex+weight*(mouseX-lastmousex)));
                         ncycoords.add((int) Math.round(lastmousey+weight*(mouseY-lastmousey)));
 
-                        client.player.sendMessage(Text.literal("latency: " + latency + ", frametime: " + frametime));
-                        System.out.println("("+mouseX+","+mouseY+"), ("+((int)Math.round(lastmousex+weight*(mouseX-lastmousex)))+","+((int) Math.round(lastmousey+weight*(mouseY-lastmousey)))+")");
+                        //client.player.sendMessage(Text.literal("latency: " + latency + ", frametime: " + frametime));
+                        //System.out.println("("+mouseX+","+mouseY+"), ("+((int)Math.round(lastmousex+weight*(mouseX-lastmousex)))+","+((int) Math.round(lastmousey+weight*(mouseY-lastmousey)))+")");
 
                         //MinecraftClient.getInstance().player.sendMessage(Text.literal((System.currentTimeMillis()-ct)+" / " + frametime));
                     }
