@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
@@ -77,31 +78,9 @@ public class Clutch implements ModInitializer {
 	public static List<Integer> cxcoords = new ArrayList<>();
 	public static List<Integer> cycoords = new ArrayList<>();
 
-	public static List<Integer> ncxcoords = new ArrayList<>();
-	public static List<Integer> ncycoords = new ArrayList<>();
-
-
-	public static List<Integer> ocxcoords = new ArrayList<>();
-	public static List<Integer> ocycoords = new ArrayList<>();
-
-	public static boolean keypressed = false;
-	public static boolean mousepressed = false;
-
-	public static int lastmousex = 0;
-	public static int lastmousey = 0;
-	public static int formermousex = 0;
-	public static int formermousey = 0;
-
-	public static long ct = 0;
-	public static long et = 0;
 
 	public static int guix = 0;
 	public static int guiy = 0;
-
-	public static int hotbarcraft = 0;
-
-
-
 
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
@@ -168,8 +147,6 @@ public class Clutch implements ModInitializer {
 		return flag;
 	}
 
-	public static final Identifier UPDATE_SLOTS_PACKET_ID =  Identifier.of(MOD_ID, "update_slots");
-
 
 	@Override
 	public void onInitialize() {
@@ -183,26 +160,6 @@ public class Clutch implements ModInitializer {
 		configured = false;
 		MinecraftClient mc = MinecraftClient.getInstance();
 
-		PayloadTypeRegistry.playC2S().register(CraftItemPayload.ID, CraftItemPayload.CODEC);
-
-		ServerPlayNetworking.registerGlobalReceiver(CraftItemPayload.ID, (payload, context) -> {
-			context.server().execute(() -> {
-				ServerPlayerEntity sp = context.server().getPlayerManager().getPlayer(mc.player.getUuid());
-				sp.getInventory().setStack(hotbarcraft,sp.currentScreenHandler.slots.get(0).getStack());
-
-				for (int i = 1; i <= 9; i++) {
-					if (!sp.currentScreenHandler.slots.get(i).getStack().getName().getString().equals("Air")){
-						ItemStack newStack = (sp.currentScreenHandler.slots.get(i).getStack().getCount() == 1) ? new ItemStack(Items.AIR,0) : new ItemStack(sp.currentScreenHandler.slots.get(i).getStack().getItem(),sp.currentScreenHandler.slots.get(i).getStack().getCount()-1);
-						sp.currentScreenHandler.slots.get(i).setStack(newStack);
-					}
-				}
-
-				sp.currentScreenHandler.sendContentUpdates();
-				sp.playerScreenHandler.sendContentUpdates();
-
-				sp.getInventory().markDirty();
-			});
-		});
 
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -254,11 +211,6 @@ public class Clutch implements ModInitializer {
 				if (client.currentScreen == null){
 					cxcoords = new ArrayList<>();
 					cycoords = new ArrayList<>();
-					ncxcoords = new ArrayList<>();
-					ncycoords = new ArrayList<>();
-
-					ocxcoords = new ArrayList<>();
-					ocycoords = new ArrayList<>();
 				}
 
 				//PLATFORM
