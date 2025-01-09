@@ -1,8 +1,5 @@
 
 # Clutch by AbyssalMC
-### **Did you know that at certain heights it is impossible to clutch?**
-https://modrinth.com/mod/clutch
-
 This mod shows whether it is possible to block ladder clutch (bladder) and boat clutch. It also contains many quality of life competitive clutching features.
 
 **Clutch possibility indicator and difficulty scale**
@@ -19,10 +16,27 @@ This mod shows whether it is possible to block ladder clutch (bladder) and boat 
 - A reset hotkey can be configured in controls
 - The reset point can be set using /platform (no arguments) which is stored in persistent data.
 - It teleports you back to the starting platform with a good position and angle.
+- You can change the offset from the default position by using /platform [int offset].
 - Pressing the reset hotkey also works in guis unlike standard auto text hotkeys
 - Positioned farther forward for faster resets than /kill
 - The pitch by default is set to 77.0 degrees, but this can be changed through /pitch [angle] which is stored locally.
 - Automatic movement can also be enabled through /automov enable, which makes the player move backwards and jump when reset.
+
+**Cursor offset**
+- There is a way to offset your cursor in GUIs from its original position in the center of the screen (960,540)
+- However it is tedious to set up after each attempt, so this mod replicates it exactly to save time
+- This can be done with /cursoroffset [cursorX] [cursorY], and can be disabled using /disableoffset
+
+**Recipe book disabling**
+- For difficult crafts it can get quite annoying when you accidentally open the recipe book.
+- To stop the recipe book from opening, use /recipebook disable
+- To completely obscure the button as well, use /recipebook occlude instead.
+
+**Input locators**
+- Show where you click in guis using /inputloc
+- 3 different locator styles
+- Can be always shown, only on misses, or disabled.
+
 
 **Cursor offset**
 - There is a way to offset your cursor in GUIs from its original position in the center of the screen (960,540)
