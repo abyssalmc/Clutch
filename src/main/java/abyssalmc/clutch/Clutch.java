@@ -13,10 +13,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.CraftingScreen;
-import net.minecraft.client.gui.screen.ingame.FurnaceScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -218,7 +215,7 @@ public class Clutch implements ModInitializer {
 					if (client.currentScreen != null) {
 						// CLOSING WITH HOTKEY
 						if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
-							if (client.currentScreen instanceof HandledScreen<?>){
+							if (client.currentScreen instanceof HandledScreen<?> || client.currentScreen instanceof CreativeInventoryScreen){
 								client.currentScreen.close();
 
 								automovementcountdown = 14;

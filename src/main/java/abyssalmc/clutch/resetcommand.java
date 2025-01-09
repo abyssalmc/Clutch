@@ -1,6 +1,7 @@
 package abyssalmc.clutch;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -24,7 +25,8 @@ public class resetcommand {
 
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment){
-        dispatcher.register(CommandManager.literal("platform").executes(resetcommand::resetPoint));
+        dispatcher.register(CommandManager.literal("platform").executes(resetcommand::resetPointNoArgs));
+        dispatcher.register(CommandManager.literal("platform").then(CommandManager.argument("coord offset", DoubleArgumentType.doubleArg()).executes(resetcommand::resetPoint)));
         dispatcher.register(CommandManager.literal("platformread").executes(resetcommand::getPlatform));
 
         dispatcher.register(CommandManager.literal("automov").then(CommandManager.literal("enable").executes(resetcommand::ae)));
@@ -50,10 +52,11 @@ public class resetcommand {
     }
 
 
-    private static int resetPoint(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static int resetPointNoArgs(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity p = mc.player;
         Block b = mc.world.getBlockState(p.getBlockPos()).getBlock();
+
         if (b == Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE ||
                 b == Blocks.ACACIA_PRESSURE_PLATE ||
                 b == Blocks.BAMBOO_PRESSURE_PLATE ||
@@ -75,10 +78,10 @@ public class resetcommand {
             double xshift = 0;
             double zshift = 0;
 
-            if (mc.world.getBlockState(base.south()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 180;tables++;zshift=0.5;}
-            if (mc.world.getBlockState(base.west()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 270;tables++;xshift=-0.5;}
-            if (mc.world.getBlockState(base.north()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 0;tables++;zshift=-0.5;}
-            if (mc.world.getBlockState(base.east()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 90;tables++;xshift=0.5;}
+            if (mc.world.getBlockState(base.south()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 180;tables++;}
+            if (mc.world.getBlockState(base.west()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 270;tables++;}
+            if (mc.world.getBlockState(base.north()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 0;tables++;}
+            if (mc.world.getBlockState(base.east()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 90;tables++;}
 
             if (tables == 0){
                 p.sendMessage(Text.literal("§cThere must be a crafting table adjacent to the standing block!"));
@@ -103,7 +106,73 @@ public class resetcommand {
 
 
 
-                p.sendMessage(Text.literal("§aPlatform set at (" + serverState.platformcoords + ")."));
+                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with no offset."));
+            }
+
+        }
+        else{
+            p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"));
+            configured = false;
+        }
+
+        return 1;
+    }
+
+    private static int resetPoint(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        PlayerEntity p = mc.player;
+        Block b = mc.world.getBlockState(p.getBlockPos()).getBlock();
+
+        double offset = DoubleArgumentType.getDouble(context, "coord offset");
+
+        if (b == Blocks.POLISHED_BLACKSTONE_PRESSURE_PLATE ||
+                b == Blocks.ACACIA_PRESSURE_PLATE ||
+                b == Blocks.BAMBOO_PRESSURE_PLATE ||
+                b == Blocks.BIRCH_PRESSURE_PLATE ||
+                b == Blocks.CHERRY_PRESSURE_PLATE ||
+                b == Blocks.CRIMSON_PRESSURE_PLATE ||
+                b == Blocks.JUNGLE_PRESSURE_PLATE ||
+                b == Blocks.MANGROVE_PRESSURE_PLATE ||
+                b == Blocks.DARK_OAK_PRESSURE_PLATE ||
+                b == Blocks.OAK_PRESSURE_PLATE ||
+                b == Blocks.SPRUCE_PRESSURE_PLATE ||
+                b == Blocks.WARPED_PRESSURE_PLATE ||
+                b == Blocks.STONE_PRESSURE_PLATE ||
+                b == Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE ||
+                b == Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE){
+            BlockPos base = p.getBlockPos().down();
+
+            int tables = 0;
+            double xshift = 0;
+            double zshift = 0;
+
+            if (mc.world.getBlockState(base.south()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 180;tables++;zshift=offset;}
+            if (mc.world.getBlockState(base.west()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 270;tables++;xshift=-offset;}
+            if (mc.world.getBlockState(base.north()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 0;tables++;zshift=-offset;}
+            if (mc.world.getBlockState(base.east()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 90;tables++;xshift=offset;}
+
+            if (tables == 0){
+                p.sendMessage(Text.literal("§cThere must be a crafting table adjacent to the standing block!"));
+                configured = false;
+            }
+            if (tables >= 2){
+                p.sendMessage(Text.literal("§cThere can only be one crafting table adjacent to the standing block!"));
+                configured = false;
+            }
+            if (tables == 1){
+                configured = true;
+                resx = p.getBlockPos().getX()+xshift+0.5;
+                resy = p.getBlockPos().getY();
+                resz = p.getBlockPos().getZ()+zshift+0.5;
+
+                StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
+                serverState.platformcoords = resx + " " + resy + " " + resz + " " + yaw + " ";
+
+
+                PacketByteBuf data = PacketByteBufs.create();
+                data.writeString(serverState.platformcoords);
+
+                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with an offset of " + offset + " blocks."));
             }
 
         }
