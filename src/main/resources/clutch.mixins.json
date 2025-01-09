@@ -3,7 +3,7 @@
 	"package": "abyssalmc.clutch.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"CursorOffset", "ModEntityDataSaver", "RecipeDisabler", "hotbar", "MouseCursorLocation", "KeyBindingLogger"
+		"CursorOffset", "ModEntityDataSaver", "RecipeDisabler", "hotbar", "MouseCursorLocation", "KeyBindingLogger", "GUICloseCancel", "GUIOpenListener"
 	],
 	"injectors": {
 		"defaultRequire": 1

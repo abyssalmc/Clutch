@@ -49,6 +49,10 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("dot").executes(resetcommand::isd)));
         dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("diamond").executes(resetcommand::iss)));
         dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("plus").executes(resetcommand::isp)));
+
+        dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("set").then(CommandManager.argument("ticks", IntegerArgumentType.integer()).executes(resetcommand::customguitime))));
+        dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("default").executes(resetcommand::resetcustomguitime)));
+
     }
 
 
@@ -174,7 +178,6 @@ public class resetcommand {
 
                 p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with an offset of " + offset + " blocks."));
             }
-
         }
         else{
             p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"));
@@ -319,6 +322,28 @@ public class resetcommand {
 
         GlobalDataHandler.setInputlocator(2);
         p.sendMessage(Text.literal("§aInput locator style set to plus."));
+
+        return 1;
+    }
+
+
+    private static int customguitime(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        guitime = IntegerArgumentType.getInteger(context, "ticks");
+        tempguitime = guitime;
+        p.sendMessage(Text.literal("§aGUI time set to " + guitime + " ticks."));
+
+
+        return 1;
+    }
+
+    private static int resetcustomguitime(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        guitime = 0;
+        p.sendMessage(Text.literal("§aGUI time set to normal, closing the table after moving 8 blocks away."));
+
 
         return 1;
     }

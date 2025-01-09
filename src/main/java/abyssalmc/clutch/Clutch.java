@@ -3,6 +3,7 @@ package abyssalmc.clutch;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -27,6 +29,7 @@ import net.minecraft.util.Identifier;
 
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -78,6 +81,8 @@ public class Clutch implements ModInitializer {
 
 	public static int guix = 0;
 	public static int guiy = 0;
+	public static int guitime = 0;
+	public static int tempguitime = 0;
 
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
@@ -144,6 +149,8 @@ public class Clutch implements ModInitializer {
 		return flag;
 	}
 
+	public static final Identifier CLOSE_GUI_PACKET_ID =  Identifier.of(MOD_ID, "close_gui");
+
 
 	@Override
 	public void onInitialize() {
@@ -157,12 +164,33 @@ public class Clutch implements ModInitializer {
 		configured = false;
 		MinecraftClient mc = MinecraftClient.getInstance();
 
+		PayloadTypeRegistry.playC2S().register(CloseGUIPayload.ID, CloseGUIPayload.CODEC);
 
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			PlayerEntity p = mc.player;
 
+			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
+				context.server().execute(() -> {
+					context.player().closeHandledScreen();
+				});
+			});
 			if (p != null) {
+				//GUI TIME
+				if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
+					if (tempguitime > 0){
+						tempguitime -= 1;
+					}
+					if (guitime != 0 && tempguitime == 0 && client.currentScreen instanceof CraftingScreen){
+						ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+					}
+				}
+				if (isKeyPressed(InputUtil.fromTranslationKey(client.options.inventoryKey.getBoundKeyTranslationKey()).getCode()) || isKeyPressed(GLFW.GLFW_KEY_ESCAPE)){
+					if (guitime != 0){
+						ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+						tempguitime = guitime;
+					}
+				}
 
 				//INDICATOR
 				double currentTime = System.currentTimeMillis();
@@ -347,6 +375,7 @@ public class Clutch implements ModInitializer {
 				}
 			}
 		});
+
 
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
 			if (showclutch){
