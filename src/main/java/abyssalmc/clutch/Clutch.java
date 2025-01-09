@@ -218,20 +218,22 @@ public class Clutch implements ModInitializer {
 					if (client.currentScreen != null) {
 						// CLOSING WITH HOTKEY
 						if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
-							client.currentScreen.close();
+							if (client.currentScreen instanceof HandledScreen<?>){
+								client.currentScreen.close();
 
-							automovementcountdown = 14;
-							if (GlobalDataHandler.getAutomov()) {
-								client.options.jumpKey.setPressed(false);
-								client.options.backKey.setPressed(false);
-							}
+								automovementcountdown = 14;
+								if (GlobalDataHandler.getAutomov()) {
+									client.options.jumpKey.setPressed(false);
+									client.options.backKey.setPressed(false);
+								}
 
-							StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-							if (!serverState.platformcoords.equals("unset")) {
-								String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-								client.getNetworkHandler().sendChatCommand(cmd);
-							} else {
-								p.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+								StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+								if (!serverState.platformcoords.equals("unset")) {
+									String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+									client.getNetworkHandler().sendChatCommand(cmd);
+								} else {
+									p.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+								}
 							}
 						}
 					}

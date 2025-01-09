@@ -43,6 +43,10 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(resetcommand::ilo)));
         dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(resetcommand::ilm)));
         dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(resetcommand::ilf)));
+
+        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("dot").executes(resetcommand::isd)));
+        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("diamond").executes(resetcommand::iss)));
+        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("plus").executes(resetcommand::isp)));
     }
 
 
@@ -218,6 +222,34 @@ public class resetcommand {
 
         GlobalDataHandler.setInputlocation(2);
         p.sendMessage(Text.literal("§aInput location utils will always be displayed."));
+
+        return 1;
+    }
+
+
+    private static int isd(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setInputlocator(0);
+        p.sendMessage(Text.literal("§aInput locator style set to dot."));
+
+        return 1;
+    }
+
+    private static int iss(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setInputlocator(1);
+        p.sendMessage(Text.literal("§aInput locator style set to diamond."));
+
+        return 1;
+    }
+
+    private static int isp(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setInputlocator(2);
+        p.sendMessage(Text.literal("§aInput locator style set to plus."));
 
         return 1;
     }

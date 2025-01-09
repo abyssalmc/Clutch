@@ -60,11 +60,17 @@ public abstract class MouseCursorLocation{
 
             int index = 0;
             for (int x : cxcoords){
-                //context.drawText(client.inGameHud.getTextRenderer(), "◦", x-1, cycoords.get(index)-3, 0xFF0000, true);
-                //context.drawText(client.inGameHud.getTextRenderer(), "⋅", x, cycoords.get(index)-4, 0xFF0000, true);
-                context.drawText(client.inGameHud.getTextRenderer(), "₊", x-1, cycoords.get(index)-5, 0xFF0000, true);
-
-
+                switch (GlobalDataHandler.getInputLocator()){
+                    case 0:
+                        context.drawText(client.inGameHud.getTextRenderer(), "⋅", x, cycoords.get(index)-4, 0xFF0000, true);
+                        break;
+                    case 1:
+                        context.drawText(client.inGameHud.getTextRenderer(), "◦", x-1, cycoords.get(index)-3, 0xFF0000, true);
+                        break;
+                    case 2:
+                        context.drawText(client.inGameHud.getTextRenderer(), "₊", x-1, cycoords.get(index)-5, 0xFF0000, true);
+                        break;
+                }
                 index++;
             }
         }

@@ -13,6 +13,7 @@ public class GlobalDataHandler {
     private static boolean automov = false;
     private static int recipe = 0;
     private static int inputlocation = 0;
+    private static int inputlocator = 0;
 
     public static void loadGlobalData() {
         try {
@@ -22,6 +23,7 @@ public class GlobalDataHandler {
                 automov = nbt.getBoolean("automov");
                 recipe = nbt.getInt("recipe");
                 inputlocation = nbt.getInt("inputlocation");
+                inputlocator = nbt.getInt("inputlocator");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -37,6 +39,7 @@ public class GlobalDataHandler {
             nbt.putBoolean("automov", automov);
             nbt.putInt("recipe", recipe);
             nbt.putInt("inputlocation", inputlocation);
+            nbt.putInt("inputlocator", inputlocator);
 
             NbtIo.write(nbt, GLOBAL_DATA_PATH);
         } catch (IOException e) {
@@ -49,9 +52,11 @@ public class GlobalDataHandler {
     public static boolean getAutomov() { return automov; }
     public static int getRecipe() { return recipe; }
     public static int getInputLocation() { return inputlocation; }
+    public static int getInputLocator() { return inputlocator; }
 
     public static void setPitch(int gpitch) { pitch = gpitch; }
     public static void setAutomov(boolean b) { automov = b; }
     public static void setRecipe(int rt) { recipe = rt; }
     public static void setInputlocation(int ipl) { inputlocation = ipl; }
+    public static void setInputlocator(int ipl) { inputlocator = ipl; }
 }
