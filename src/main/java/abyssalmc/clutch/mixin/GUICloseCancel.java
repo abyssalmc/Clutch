@@ -1,6 +1,7 @@
 package abyssalmc.clutch.mixin;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
@@ -17,7 +18,7 @@ import static abyssalmc.clutch.Clutch.guitime;
 public class GUICloseCancel {
     @Inject(method = "close", at = @At("HEAD"), cancellable = true)
     private void cancelClose(CallbackInfo ci){
-        if (guitime != 0){
+        if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){
             ci.cancel();
         }
     }

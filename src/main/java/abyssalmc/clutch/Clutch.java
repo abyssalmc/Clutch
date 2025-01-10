@@ -186,7 +186,7 @@ public class Clutch implements ModInitializer {
 					context.player().closeHandledScreen();
 				});
 			});
-			if (p != null) {
+			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
 				//ATTEMPT COUNTER
 				overplate = false;
 				BlockPos platepos = new BlockPos(0,0,0);
@@ -235,9 +235,6 @@ public class Clutch implements ModInitializer {
 							serverState.platformattempts = pta + "(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") 1 | ";
 						}
 					}
-					StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-
-					p.sendMessage(Text.literal(serverState.platformattempts));
 				}
 				lastoverplate = overplate;
 
