@@ -12,6 +12,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -57,6 +58,9 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("osu").executes(resetcommand::cso)));
         dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("basskick").executes(resetcommand::csb)));
 
+        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("get").executes(resetcommand::attemptsget)));
+        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("reset").executes(resetcommand::attemptsreset)));
+        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("clear").executes(resetcommand::attemptsclear)));
 
     }
 
@@ -376,6 +380,82 @@ public class resetcommand {
 
         GlobalDataHandler.setCustomSounds(2);
         p.sendMessage(Text.literal("§aGUI input sound set to bass kick."));
+
+        return 1;
+    }
+
+    private static int resetplatformthing(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(MinecraftClient.getInstance().getServer());
+        serverState.platformattempts = "";
+        return 1;
+    }
+
+
+    private static int attemptsget(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+            StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(MinecraftClient.getInstance().getServer());
+
+            String pta = serverState.platformattempts;
+            String[] allattempts = pta.split(" \\| ");
+
+            BlockPos platepos = context.getSource().getPlayer().getBlockPos();
+            int attemptcount = -1;
+            for (String attempts : allattempts) {
+                if (attempts.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ())) {
+                    attemptcount = Integer.parseInt(attempts.split(" ")[attempts.split(" ").length - 1]) + 1;
+                }
+            }
+            if (attemptcount != -1) {
+                p.sendMessage(Text.literal("§aThere have been " + (attemptcount-1) + " attempts on this platform."));
+            } else {
+                p.sendMessage(Text.literal("§cThere are no recorded attempts here. Make sure you are standing on the platform pressure plate!"));
+            }
+        }
+
+
+        return 1;
+    }
+
+    private static int attemptsreset(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(MinecraftClient.getInstance().getServer());
+
+        String pta = serverState.platformattempts;
+        String[] allattempts = pta.split(" \\| ");
+
+        BlockPos platepos = context.getSource().getPlayer().getBlockPos();
+
+        int removalcount = 0;
+        String newattemptstring = "";
+        for (String attempts : allattempts) {
+            if (!attempts.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ())) {
+                newattemptstring = attempts + " | ";
+            } else {
+                removalcount++;
+            }
+        }
+        if (removalcount == 0) {
+            p.sendMessage(Text.literal("§cCould not remove attempts as none are recorded. Make sure to stand on the platform pressure plate!"));
+        } else {
+            p.sendMessage(Text.literal("§aPlatform attempts reset to 0."));
+        }
+        serverState.platformattempts = newattemptstring;
+        return 1;
+    }
+
+
+    private static int attemptsclear(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(MinecraftClient.getInstance().getServer());
+
+        String pta = serverState.platformattempts;
+
+        serverState.platformattempts = "";
+        p.sendMessage(Text.literal("§aAll persistent platform attempts have been cleared."));
 
         return 1;
     }

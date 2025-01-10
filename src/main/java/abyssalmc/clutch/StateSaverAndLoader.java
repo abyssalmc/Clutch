@@ -7,14 +7,19 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class StateSaverAndLoader extends PersistentState {
 
     public String platformcoords = "unset";
+    public String platformattempts = "";
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         nbt.putString("platformpos", platformcoords);
+        nbt.putString("platformattempts", platformattempts);
         return nbt;
     }
 
@@ -22,6 +27,7 @@ public class StateSaverAndLoader extends PersistentState {
     public static StateSaverAndLoader createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         StateSaverAndLoader state = new StateSaverAndLoader();
         state.platformcoords = tag.getString("platformpos");
+        state.platformattempts = tag.getString("platformattempts");
         return state;
     }
 

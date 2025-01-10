@@ -11,6 +11,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -42,6 +45,8 @@ import abyssalmc.clutch.event.keyinputhandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static abyssalmc.clutch.event.keyinputhandler.*;
 import static net.minecraft.util.math.MathHelper.floor;
@@ -84,6 +89,9 @@ public class Clutch implements ModInitializer {
 	public static int guiy = 0;
 	public static int guitime = 0;
 	public static int tempguitime = 0;
+
+	public static boolean overplate = false;
+	public static boolean lastoverplate = false;
 
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
@@ -179,6 +187,59 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null) {
+				//ATTEMPT COUNTER
+				overplate = false;
+				BlockPos platepos = new BlockPos(0,0,0);
+				for (int x = 0; x < 1; x++){
+					for (int z = 0; z < 1; z++){
+						double xcoord = p.getX()+0.6*x-0.3;
+						double zcoord = p.getZ()+0.6*x-0.3;
+
+						if (mc.world.getBlockState(new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord))).getBlock().getName().toString().contains("pressure_plate")){
+							overplate = true;
+							platepos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+						}
+					}
+				}
+				if (lastoverplate != overplate && overplate){
+					if (client.isIntegratedServerRunning() && client.getServer() != null) {
+						StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+						String pta = serverState.platformattempts;
+						if (pta == ""){
+							serverState.platformattempts = "(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") 1 | ";
+						} else if (pta.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") ")){
+							String[] allattempts = pta.split(" \\| ");
+							int index = 0;
+							String newplatformattempts = "";
+							for (String attempts : allattempts){
+								if (attempts.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ())){
+									int attemptcount = Integer.parseInt(attempts.split(" ")[attempts.split(" ").length-1]) + 1;
+									String newString = "";
+									int index2 = 0;
+									for (String str : attempts.split(" ")){
+										if (index2 != attempts.split(" ").length-1){
+											newString += str + " ";
+										}
+										index2++;
+									}
+									newString += attemptcount + " | ";
+									newplatformattempts = newplatformattempts + newString;
+
+								} else {
+									newplatformattempts = newplatformattempts + attempts + " | ";
+								}
+
+							}
+							serverState.platformattempts = newplatformattempts;
+						} else {
+							serverState.platformattempts = pta + "(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") 1 | ";
+						}
+					}
+					StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+
+					p.sendMessage(Text.literal(serverState.platformattempts));
+				}
+				lastoverplate = overplate;
 
 
 				//GUI TIME
