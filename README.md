@@ -45,5 +45,10 @@ This mod shows whether it is possible to block ladder clutch (bladder) and boat 
 - A custom gui time in ticks can be set using /guitime set [time].
 - It may be disabled using /guitime default or /guitime set 0.
 
+**Attempt tracker**
+- Track the number of attempts a clutch takes using /attempts get.
+- Remove a platform's attempts using /attempts remove.
+- Clear all persistent attempts using /attempts clear.
+
 ![mod icon](https://cdn.modrinth.com/data/cached_images/74b2a2f95183019fcc775191ff24e749ef464790.png)
 
