@@ -33,15 +33,17 @@ This mod shows whether it is possible to block ladder clutch (bladder) and boat 
 - To completely obscure the button as well, use /recipebook occlude instead.
 
 **Input locators**
-- Show where you click in guis using /inputloc
-- 3 different locator styles
+- Show where you click in guis using /inputloc.
+- 3 different locator styles.
 - Can be always shown, only on misses, or disabled.
 
-
-**Cursor offset**
-- There is a way to offset your cursor in GUIs from its original position in the center of the screen (960,540)
-- However it is tedious to set up after each attempt, so this mod replicates it exactly to save time
-- This can be done with /cursoroffset [cursorX] [cursorY], and can be disabled using /disableoffset
+**GUI input sounds**
+- Set a sound to play when you make an input using /guiinputsounds [sound].
+- This sound may be set to either "osu" or "basskick".
+  
+**Custom GUI time**
+- A custom gui time in ticks can be set using /guitime set [time].
+- It may be disabled using /guitime default or /guitime set 0.
 
 ![mod icon](https://cdn.modrinth.com/data/cached_images/74b2a2f95183019fcc775191ff24e749ef464790.png)
 
