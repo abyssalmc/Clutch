@@ -93,6 +93,7 @@ public class Clutch implements ModInitializer {
 	public static boolean overplate = false;
 	public static boolean lastoverplate = false;
 
+	public static boolean closepass = false;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		Vec3d eyePosition = player.getCameraPosVec(1.0F);
 		Vec3d lookVector = player.getRotationVec(1.0F);
@@ -183,6 +184,7 @@ public class Clutch implements ModInitializer {
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
+					closepass = true;
 					context.player().closeHandledScreen();
 				});
 			});
@@ -245,20 +247,23 @@ public class Clutch implements ModInitializer {
 
 
 				//GUI TIME
+
 				if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
 					if (tempguitime > 0){
 						tempguitime -= 1;
 					}
 					if (guitime != 0 && tempguitime == 0 && client.currentScreen instanceof CraftingScreen){
+
 						ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
 					}
-				}
-				if (isKeyPressed(InputUtil.fromTranslationKey(client.options.inventoryKey.getBoundKeyTranslationKey()).getCode()) || isKeyPressed(GLFW.GLFW_KEY_ESCAPE)){
-					if (guitime != 0){
-						ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
-						tempguitime = guitime;
+					if (isKeyPressed(InputUtil.fromTranslationKey(client.options.inventoryKey.getBoundKeyTranslationKey()).getCode()) || isKeyPressed(GLFW.GLFW_KEY_ESCAPE)){
+						if (guitime != 0){
+							ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+							tempguitime = guitime;
+						}
 					}
 				}
+
 
 				//INDICATOR
 				double currentTime = System.currentTimeMillis();
@@ -311,7 +316,8 @@ public class Clutch implements ModInitializer {
 					if (client.currentScreen != null) {
 						// CLOSING WITH HOTKEY
 						if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
-							if (client.currentScreen instanceof HandledScreen<?> || client.currentScreen instanceof CreativeInventoryScreen){
+							if (client.currentScreen instanceof CraftingScreen){
+
 								client.currentScreen.close();
 
 								automovementcountdown = 14;
