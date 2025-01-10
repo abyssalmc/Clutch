@@ -192,12 +192,17 @@ public class Clutch implements ModInitializer {
 				BlockPos platepos = new BlockPos(0,0,0);
 				for (int x = 0; x < 1; x++){
 					for (int z = 0; z < 1; z++){
-						double xcoord = p.getX()+0.6*x-0.3;
-						double zcoord = p.getZ()+0.6*x-0.3;
-
-						if (mc.world.getBlockState(new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord))).getBlock().getName().toString().contains("pressure_plate")){
-							overplate = true;
-							platepos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+						double xcoord = p.getX()+0.6*x - 0.3 + (2*x-1)*0.0625;
+						double zcoord = p.getZ()+0.6*x - 0.3 + (2*z-1)*0.0625;
+						BlockPos hitboxpos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+						if (mc.world.getBlockState(hitboxpos).getBlock().getName().toString().contains("pressure_plate")){
+							if (mc.world.getBlockState(hitboxpos.down().north()).getBlock().getName().toString().contains("crafting_table") ||
+									mc.world.getBlockState(hitboxpos.down().east()).getBlock().getName().toString().contains("crafting_table") ||
+									mc.world.getBlockState(hitboxpos.down().south()).getBlock().getName().toString().contains("crafting_table") ||
+									mc.world.getBlockState(hitboxpos.down().west()).getBlock().getName().toString().contains("crafting_table")){
+								overplate = true;
+								platepos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+							}
 						}
 					}
 				}
