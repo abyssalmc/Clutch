@@ -1,5 +1,7 @@
 {
   "key.category.clutch.main": "Clutch",
   "key.category.clutch.show": "Toggle hud",
-  "key.category.clutch.reset": "Reset hotkey"
+  "key.category.clutch.reset": "Reset hotkey",
+  "subtitles.clutch.osu": "GUI input (osu)",
+  "subtitles.clutch.basskick": "GUI input (bass kick)"
 }

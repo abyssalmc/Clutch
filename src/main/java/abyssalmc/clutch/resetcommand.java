@@ -53,6 +53,11 @@ public class resetcommand {
         dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("set").then(CommandManager.argument("ticks", IntegerArgumentType.integer()).executes(resetcommand::customguitime))));
         dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("default").executes(resetcommand::resetcustomguitime)));
 
+        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("off").executes(resetcommand::csd)));
+        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("osu").executes(resetcommand::cso)));
+        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("basskick").executes(resetcommand::csb)));
+
+
     }
 
 
@@ -347,4 +352,32 @@ public class resetcommand {
 
         return 1;
     }
+
+    private static int csd(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setCustomSounds(0);
+        p.sendMessage(Text.literal("§aGUI input sounds disabled."));
+
+        return 1;
+    }
+
+    private static int cso(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setCustomSounds(1);
+        p.sendMessage(Text.literal("§aGUI input sound set to osu."));
+
+        return 1;
+    }
+
+    private static int csb(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        GlobalDataHandler.setCustomSounds(2);
+        p.sendMessage(Text.literal("§aGUI input sound set to bass kick."));
+
+        return 1;
+    }
+
 }

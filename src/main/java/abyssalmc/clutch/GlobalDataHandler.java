@@ -14,6 +14,7 @@ public class GlobalDataHandler {
     private static int recipe = 0;
     private static int inputlocation = 0;
     private static int inputlocator = 0;
+    private static int customsounds = 0;
 
     public static void loadGlobalData() {
         try {
@@ -24,6 +25,7 @@ public class GlobalDataHandler {
                 recipe = nbt.getInt("recipe");
                 inputlocation = nbt.getInt("inputlocation");
                 inputlocator = nbt.getInt("inputlocator");
+                customsounds = nbt.getInt("customsounds");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,6 +42,7 @@ public class GlobalDataHandler {
             nbt.putInt("recipe", recipe);
             nbt.putInt("inputlocation", inputlocation);
             nbt.putInt("inputlocator", inputlocator);
+            nbt.putInt("customsounds", customsounds);
 
             NbtIo.write(nbt, GLOBAL_DATA_PATH);
         } catch (IOException e) {
@@ -53,10 +56,13 @@ public class GlobalDataHandler {
     public static int getRecipe() { return recipe; }
     public static int getInputLocation() { return inputlocation; }
     public static int getInputLocator() { return inputlocator; }
+    public static int getCustomSounds() { return customsounds; }
+
 
     public static void setPitch(int gpitch) { pitch = gpitch; }
     public static void setAutomov(boolean b) { automov = b; }
     public static void setRecipe(int rt) { recipe = rt; }
     public static void setInputlocation(int ipl) { inputlocation = ipl; }
     public static void setInputlocator(int ipl) { inputlocator = ipl; }
+    public static void setCustomSounds(int sound) { customsounds = sound; }
 }

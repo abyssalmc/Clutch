@@ -1,5 +1,6 @@
 package abyssalmc.clutch;
 
+import abyssalmc.clutch.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -161,6 +162,8 @@ public class Clutch implements ModInitializer {
 
 		keyinputhandler.register();
 
+		ModSounds.registerSounds();
+
 		configured = false;
 		MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -176,6 +179,8 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null) {
+
+
 				//GUI TIME
 				if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
 					if (tempguitime > 0){

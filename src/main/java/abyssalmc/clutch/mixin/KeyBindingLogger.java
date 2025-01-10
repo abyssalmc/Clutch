@@ -1,6 +1,7 @@
 package abyssalmc.clutch.mixin;
 
 import abyssalmc.clutch.GlobalDataHandler;
+import abyssalmc.clutch.sound.ModSounds;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.sound.SoundCategory;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,15 +24,32 @@ public class KeyBindingLogger {
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     private void captureKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
+
+        int ishotkey = 0;
+        for (KeyBinding hotkey : client.options.hotbarKeys){
+            if (InputUtil.fromTranslationKey(hotkey.getBoundKeyTranslationKey()).getCode() == key){
+                ishotkey++;
+                break;
+            }
+        }
+
+
         if (client.player != null && (client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof InventoryScreen)){
-            if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
-                int ishotkey = 0;
-                for (KeyBinding hotkey : client.options.hotbarKeys){
-                    if (InputUtil.fromTranslationKey(hotkey.getBoundKeyTranslationKey()).getCode() == key){
+            if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT && ishotkey > 0) {
+                switch (GlobalDataHandler.getCustomSounds()){
+                    case 0:
                         break;
-                    }
-                    ishotkey++;
+                    case 1:
+                        client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 999, 1);
+                        break;
+                    case 2:
+                        client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 999, 1);
+                        break;
                 }
+            }
+
+            if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
+
                 if (ishotkey != 0){
                     if (GlobalDataHandler.getInputLocation() > 0){
                         double xdim = client.getWindow().getScaledWidth(), ydim = client.getWindow().getScaledHeight();
@@ -48,8 +67,10 @@ public class KeyBindingLogger {
                         }
 
                         if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2){
-                            cxcoords.add((int)Math.round(mouseX));
-                            cycoords.add((int)Math.round(mouseY));
+                            if (ishotkey > 0){
+                                cxcoords.add((int)Math.round(mouseX));
+                                cycoords.add((int)Math.round(mouseY));
+                            }
                         }
                     }
                 }

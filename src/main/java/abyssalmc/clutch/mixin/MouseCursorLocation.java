@@ -1,6 +1,7 @@
 package abyssalmc.clutch.mixin;
 
 import abyssalmc.clutch.*;
+import abyssalmc.clutch.sound.ModSounds;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -13,6 +14,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -79,6 +81,17 @@ public abstract class MouseCursorLocation{
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onKeyPressed(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
+        switch (GlobalDataHandler.getCustomSounds()){
+            case 0:
+                break;
+            case 1:
+                client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 999, 1);
+                break;
+            case 2:
+                client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 999, 1);
+                break;
+        }
+
         if (client.player != null && client.currentScreen != null) {
             if (GlobalDataHandler.getInputLocation() > 0){
                 int overslot = 0;

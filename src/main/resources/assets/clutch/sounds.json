@@ -1,0 +1,14 @@
+{
+  "osu": {
+    "subtitle": "subtitles.clutch.osu",
+    "sounds": [
+      "clutch:osu"
+    ]
+  },
+  "basskick": {
+    "subtitle": "subtitles.clutch.basskick",
+    "sounds": [
+      "clutch:basskick"
+    ]
+  }
+}
