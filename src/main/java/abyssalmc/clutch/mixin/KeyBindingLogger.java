@@ -32,10 +32,13 @@ public class KeyBindingLogger {
                 break;
             }
         }
+        if (InputUtil.fromTranslationKey(client.options.swapHandsKey.getBoundKeyTranslationKey()).getCode() == key){
+            ishotkey++;
+        }
 
 
         if (client.player != null && (client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof InventoryScreen)){
-            if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT && ishotkey > 0) {
+            if ((action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) && ishotkey != 0) {
                 switch (GlobalDataHandler.getCustomSounds()){
                     case 0:
                         break;
