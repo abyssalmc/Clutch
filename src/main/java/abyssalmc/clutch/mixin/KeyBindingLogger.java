@@ -1,7 +1,11 @@
 package abyssalmc.clutch.mixin;
 
+import abyssalmc.clutch.CloseGUIPayload;
 import abyssalmc.clutch.GlobalDataHandler;
+import abyssalmc.clutch.StateSaverAndLoader;
+import abyssalmc.clutch.event.keyinputhandler;
 import abyssalmc.clutch.sound.ModSounds;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
@@ -11,6 +15,8 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.event.keyinputhandler.*;
 
 @Mixin(Keyboard.class)
 public class KeyBindingLogger {
@@ -25,6 +32,7 @@ public class KeyBindingLogger {
     private void captureKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
 
+        // CLICK INDICATOR AND SOUND
         int ishotkey = 0;
         for (KeyBinding hotkey : client.options.hotbarKeys){
             if (InputUtil.fromTranslationKey(hotkey.getBoundKeyTranslationKey()).getCode() == key){
@@ -75,6 +83,32 @@ public class KeyBindingLogger {
                                 cycoords.add((int)Math.round(mouseY));
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        // RESET KEY
+        if (MinecraftClient.getInstance().player != null){
+            if (key == InputUtil.fromTranslationKey(resetkey.getBoundKeyTranslationKey()).getCode() && action == GLFW.GLFW_PRESS){
+                if (client.isIntegratedServerRunning() && client.getServer() != null) {
+                    if (client.currentScreen != null){
+                        ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+                    }
+
+                    automovementcountdown = 15;
+                    if (GlobalDataHandler.getAutomov()) {
+                        client.options.jumpKey.setPressed(false);
+                        client.options.backKey.setPressed(false);
+                    }
+
+                    StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+                    if (!serverState.platformcoords.equals("unset")) {
+                        String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+                        client.getNetworkHandler().sendChatCommand(cmd);
+                    }
+                    else {
+                        client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
                     }
                 }
             }

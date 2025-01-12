@@ -95,24 +95,29 @@ public class Clutch implements ModInitializer {
 
 	public static boolean closepass = false;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
-		Vec3d eyePosition = player.getCameraPosVec(1.0F);
-		Vec3d lookVector = player.getRotationVec(1.0F);
-		Vec3d endVec = eyePosition.add(lookVector.multiply(maxDistance));
+		if (player != null){
 
-		//raycast
-		BlockHitResult hitResult = world.raycast(new RaycastContext(
-				eyePosition,
-				endVec,
-				RaycastContext.ShapeType.OUTLINE,
-				RaycastContext.FluidHandling.NONE,
-				player
-		));
+			Vec3d eyePosition = player.getCameraPosVec(1.0F);
+			Vec3d lookVector = player.getRotationVec(1.0F);
+			Vec3d endVec = eyePosition.add(lookVector.multiply(maxDistance));
 
-		if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
-			return 99999;
+			//raycast
+			BlockHitResult hitResult = world.raycast(new RaycastContext(
+					eyePosition,
+					endVec,
+					RaycastContext.ShapeType.OUTLINE,
+					RaycastContext.FluidHandling.NONE,
+					player
+			));
+
+			if (hitResult == null || hitResult.getType() != HitResult.Type.BLOCK) {
+				return 99999;
+			}
+
+			return hitResult.getBlockPos().getY();
+		} else {
+			return 0;
 		}
-
-		return hitResult.getBlockPos().getY();
 	}
 
 	Identifier bladder = Identifier.of(Clutch.MOD_ID, "textures/bladder.png");
@@ -247,7 +252,6 @@ public class Clutch implements ModInitializer {
 
 
 				//GUI TIME
-
 				if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
 					if (tempguitime > 0){
 						tempguitime -= 1;
@@ -311,32 +315,6 @@ public class Clutch implements ModInitializer {
 					cycoords = new ArrayList<>();
 				}
 
-				//PLATFORM
-				if (client.isIntegratedServerRunning() && client.getServer() != null) {
-					if (client.currentScreen != null) {
-						// CLOSING WITH HOTKEY
-						if (isKeyPressed((int) resetkey.getBoundKeyLocalizedText().getString().charAt(0)) && resetkey.getBoundKeyLocalizedText().getString().length() == 1) {
-							if (client.currentScreen instanceof CraftingScreen){
-
-								client.currentScreen.close();
-
-								automovementcountdown = 14;
-								if (GlobalDataHandler.getAutomov()) {
-									client.options.jumpKey.setPressed(false);
-									client.options.backKey.setPressed(false);
-								}
-
-								StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-								if (!serverState.platformcoords.equals("unset")) {
-									String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-									client.getNetworkHandler().sendChatCommand(cmd);
-								} else {
-									p.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
-								}
-							}
-						}
-					}
-				}
 			}
 
 			clock++;
@@ -344,6 +322,7 @@ public class Clutch implements ModInitializer {
 				clock=0;
 
 				if (showclutch) {
+
 					Integer groundY = Clutch.getBlockPosPlayerIsLookingAt(mc.player, mc.world, 300.0) + 1;
 
 					double y = p.getY();
@@ -433,6 +412,8 @@ public class Clutch implements ModInitializer {
 						bladderv = 5;
 						hayv = 4;
 					}
+
+
 				}
 			}
 

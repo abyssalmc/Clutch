@@ -9,8 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static abyssalmc.clutch.Clutch.guitime;
-import static abyssalmc.clutch.Clutch.tempguitime;
+import java.util.ArrayList;
+
+import static abyssalmc.clutch.Clutch.*;
 
 @Mixin(MinecraftClient.class)
 public class GUIOpenListener {
@@ -18,6 +19,8 @@ public class GUIOpenListener {
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         if (screen instanceof CraftingScreen) {
             tempguitime = guitime;
+            cxcoords = new ArrayList<>();
+            cycoords = new ArrayList<>();
         }
     }
 }

@@ -53,31 +53,6 @@ public class keyinputhandler {
             else{
                 reset = true;
             }
-
-            if(resetkey.isPressed()) {
-                if (repeatcheck){
-                    repeatcheck = false;
-
-                    automovementcountdown = 15;
-                    if (GlobalDataHandler.getAutomov()) {
-                        client.options.jumpKey.setPressed(false);
-                        client.options.backKey.setPressed(false);
-                    }
-
-                    StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-                    if (!serverState.platformcoords.equals("unset")) {
-                        String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-                        client.getNetworkHandler().sendChatCommand(cmd);
-                    }
-                    else {
-                        client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
-                    }
-
-                }
-            }
-            else{
-                repeatcheck = true;
-            }
         });
     }
 

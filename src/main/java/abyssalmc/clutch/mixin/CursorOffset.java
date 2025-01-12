@@ -18,10 +18,9 @@ public class CursorOffset {
     @Inject(method = "setScreen", at = @At("HEAD"))
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         if (screen instanceof CraftingScreen) {
-            if (offsetEnabled){
+            if (offsetEnabled) {
                 unlockAndSetCursor(cursorx, cursory);
             }
-
         }
     }
 

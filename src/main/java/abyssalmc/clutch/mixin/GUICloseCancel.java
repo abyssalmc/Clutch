@@ -21,17 +21,16 @@ import static abyssalmc.clutch.Clutch.guitime;
 @Mixin(ServerPlayerEntity.class)
 public class GUICloseCancel {
     @Inject(method = "closeHandledScreen", at = @At("HEAD"), cancellable = true)
-    private void cancelClose(CallbackInfo ci){
-        if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){
-            if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
-                if (!closepass){
+    private void cancelClose(CallbackInfo ci) {
+        if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+            if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen) {
+                if (!closepass) {
                     ci.cancel();
+                    ((ServerPlayerEntity) (Object) this).currentScreenHandler.syncState();
                 } else {
                     closepass = false;
                 }
-
             }
         }
     }
-
 }
