@@ -11,9 +11,6 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -22,13 +19,6 @@ import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import net.minecraft.util.hit.BlockHitResult;
@@ -45,17 +35,13 @@ import abyssalmc.clutch.event.keyinputhandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static abyssalmc.clutch.event.keyinputhandler.*;
-import static net.minecraft.util.math.MathHelper.floor;
 
 public class Clutch implements ModInitializer {
 
 	public static final String MOD_ID = "clutch";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	//fuck
 	int clock = 0;
 
 	public static double resx = 0;
@@ -267,7 +253,6 @@ public class Clutch implements ModInitializer {
 						}
 					}
 				}
-
 
 				//INDICATOR
 				double currentTime = System.currentTimeMillis();

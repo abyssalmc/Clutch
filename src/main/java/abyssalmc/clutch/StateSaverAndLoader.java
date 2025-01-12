@@ -7,9 +7,6 @@ import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class StateSaverAndLoader extends PersistentState {
 

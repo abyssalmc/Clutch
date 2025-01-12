@@ -3,7 +3,6 @@ package abyssalmc.clutch.mixin;
 import abyssalmc.clutch.CloseGUIPayload;
 import abyssalmc.clutch.GlobalDataHandler;
 import abyssalmc.clutch.StateSaverAndLoader;
-import abyssalmc.clutch.event.keyinputhandler;
 import abyssalmc.clutch.sound.ModSounds;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Keyboard;
