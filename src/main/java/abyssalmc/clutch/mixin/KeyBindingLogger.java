@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.option.KeyBinding;
@@ -92,23 +93,25 @@ public class KeyBindingLogger {
         if (MinecraftClient.getInstance().player != null){
             if (key == InputUtil.fromTranslationKey(resetkey.getBoundKeyTranslationKey()).getCode() && action == GLFW.GLFW_PRESS){
                 if (client.isIntegratedServerRunning() && client.getServer() != null) {
-                    if (client.currentScreen != null){
-                        ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
-                    }
+                    if ((client.currentScreen instanceof HandledScreen<?> || client.currentScreen == null) && !(client.currentScreen instanceof CreativeInventoryScreen)){
+                        if (client.currentScreen != null){
+                            ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+                        }
 
-                    automovementcountdown = 15;
-                    if (GlobalDataHandler.getAutomov()) {
-                        client.options.jumpKey.setPressed(false);
-                        client.options.backKey.setPressed(false);
-                    }
+                        automovementcountdown = 15;
+                        if (GlobalDataHandler.getAutomov()) {
+                            client.options.jumpKey.setPressed(false);
+                            client.options.backKey.setPressed(false);
+                        }
 
-                    StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-                    if (!serverState.platformcoords.equals("unset")) {
-                        String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-                        client.getNetworkHandler().sendChatCommand(cmd);
-                    }
-                    else {
-                        client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+                        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+                        if (!serverState.platformcoords.equals("unset")) {
+                            String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+                            client.getNetworkHandler().sendChatCommand(cmd);
+                        }
+                        else {
+                            client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+                        }
                     }
                 }
             }

@@ -172,7 +172,7 @@ public class Clutch implements ModInitializer {
 		GlobalDataHandler.loadGlobalData();
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> GlobalDataHandler.saveGlobalData());
 
-		CommandRegistrationCallback.EVENT.register(resetcommand::register);
+		CommandRegistrationCallback.EVENT.register(ClutchCommand::register);
 
 		keyinputhandler.register();
 

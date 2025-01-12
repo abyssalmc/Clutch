@@ -1,25 +1,11 @@
 package abyssalmc.clutch.event;
 
-import abyssalmc.clutch.GlobalDataHandler;
-import abyssalmc.clutch.StateSaverAndLoader;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.scoreboard.*;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Collection;
-import java.util.List;
-import static abyssalmc.clutch.Clutch.*;
-
-import static abyssalmc.clutch.resetcommand.yaw;
-import static java.lang.Math.abs;
-
 public class keyinputhandler {
     public static final String KEY_CATEGORY_CLUTCH = "key.category.clutch.main";
     public static final String KEY_CATEGORY_SHOW = "key.category.clutch.show";

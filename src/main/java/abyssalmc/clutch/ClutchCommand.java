@@ -2,6 +2,7 @@ package abyssalmc.clutch;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -10,9 +11,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -20,47 +21,51 @@ import net.minecraft.util.math.BlockPos;
 
 import static abyssalmc.clutch.Clutch.*;
 
-public class resetcommand {
+public class ClutchCommand {
 
     public static double yaw;
 
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess commandRegistryAccess, CommandManager.RegistrationEnvironment registrationEnvironment){
-        dispatcher.register(CommandManager.literal("platform").executes(resetcommand::resetPointNoArgs));
-        dispatcher.register(CommandManager.literal("platform").then(CommandManager.argument("coord offset", DoubleArgumentType.doubleArg()).executes(resetcommand::resetPoint)));
-        dispatcher.register(CommandManager.literal("platformread").executes(resetcommand::getPlatform));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("platform").executes(ClutchCommand::resetPointNoArgs)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("platform").then(CommandManager.argument("coord offset", DoubleArgumentType.doubleArg()).executes(ClutchCommand::resetPoint))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("platformread").executes(ClutchCommand::getPlatform)));
 
-        dispatcher.register(CommandManager.literal("automov").then(CommandManager.literal("enable").executes(resetcommand::ae)));
-        dispatcher.register(CommandManager.literal("automov").then(CommandManager.literal("disable").executes(resetcommand::ad)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("automov").then(CommandManager.literal("enable").executes(ClutchCommand::ae))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("automov").then(CommandManager.literal("disable").executes(ClutchCommand::ad))));
 
 
-        dispatcher.register(CommandManager.literal("cursoroffset").then(CommandManager.argument("cursorX", IntegerArgumentType.integer()).then(CommandManager.argument("cursorY", IntegerArgumentType.integer()).executes(resetcommand::cursorOffset))));
-        dispatcher.register(CommandManager.literal("disableoffset").executes(resetcommand::disableOffset));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("cursoroffset").then(CommandManager.argument("cursorX", IntegerArgumentType.integer()).then(CommandManager.argument("cursorY", IntegerArgumentType.integer()).executes(ClutchCommand::cursorOffset)))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("disableoffset").executes(ClutchCommand::disableOffset)));
 
-        dispatcher.register(CommandManager.literal("pitch").then(CommandManager.argument("angle", IntegerArgumentType.integer()).executes(resetcommand::setpitch)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("pitch").then(CommandManager.argument("angle", IntegerArgumentType.integer()).executes(ClutchCommand::setpitch))));
 
-        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("default").executes(resetcommand::rbn)));
-        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("disable").executes(resetcommand::rbd)));
-        dispatcher.register(CommandManager.literal("recipebook").then(CommandManager.literal("occlude").executes(resetcommand::rbo)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("recipebook").then(CommandManager.literal("default").executes(ClutchCommand::rbn))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("recipebook").then(CommandManager.literal("disable").executes(ClutchCommand::rbd))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("recipebook").then(CommandManager.literal("occlude").executes(ClutchCommand::rbo))));
 
-        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(resetcommand::ilo)));
-        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(resetcommand::ilm)));
-        dispatcher.register(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(resetcommand::ilf)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputloc").then(CommandManager.literal("off").executes(ClutchCommand::ilo))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputloc").then(CommandManager.literal("misses").executes(ClutchCommand::ilm))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputloc").then(CommandManager.literal("full").executes(ClutchCommand::ilf))));
 
-        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("dot").executes(resetcommand::isd)));
-        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("diamond").executes(resetcommand::iss)));
-        dispatcher.register(CommandManager.literal("inputlocstyle").then(CommandManager.literal("plus").executes(resetcommand::isp)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputlocstyle").then(CommandManager.literal("dot").executes(ClutchCommand::isd))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputlocstyle").then(CommandManager.literal("diamond").executes(ClutchCommand::iss))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputlocstyle").then(CommandManager.literal("plus").executes(ClutchCommand::isp))));
 
-        dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("set").then(CommandManager.argument("ticks", IntegerArgumentType.integer()).executes(resetcommand::customguitime))));
-        dispatcher.register(CommandManager.literal("guitime").then(CommandManager.literal("default").executes(resetcommand::resetcustomguitime)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("guitime").then(CommandManager.literal("set").then(CommandManager.argument("ticks", IntegerArgumentType.integer()).executes(ClutchCommand::customguitime)))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("guitime").then(CommandManager.literal("default").executes(ClutchCommand::resetcustomguitime))));
 
-        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("off").executes(resetcommand::csd)));
-        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("osu").executes(resetcommand::cso)));
-        dispatcher.register(CommandManager.literal("guiinputsounds").then(CommandManager.literal("basskick").executes(resetcommand::csb)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputsounds").then(CommandManager.literal("off").executes(ClutchCommand::csd))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputsounds").then(CommandManager.literal("osu").executes(ClutchCommand::cso))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputsounds").then(CommandManager.literal("basskick").executes(ClutchCommand::csb))));
 
-        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("get").executes(resetcommand::attemptsget)));
-        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("reset").executes(resetcommand::attemptsreset)));
-        dispatcher.register(CommandManager.literal("attempts").then(CommandManager.literal("clear").executes(resetcommand::attemptsclear)));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("attempts").then(CommandManager.literal("get").executes(ClutchCommand::attemptsget))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("attempts").then(CommandManager.literal("reset").executes(ClutchCommand::attemptsreset))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("attempts").then(CommandManager.literal("clear").executes(ClutchCommand::attemptsclear))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("health").then(CommandManager.argument("health", FloatArgumentType.floatArg()).executes(ClutchCommand::sethealth))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("hunger").then(CommandManager.argument("hunger", IntegerArgumentType.integer()).executes(ClutchCommand::sethunger))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("saturation").then(CommandManager.argument("saturation", FloatArgumentType.floatArg()).executes(ClutchCommand::setsat))));
 
     }
 
@@ -456,6 +461,32 @@ public class resetcommand {
 
         serverState.platformattempts = "";
         p.sendMessage(Text.literal("§aAll persistent platform attempts have been cleared."));
+
+        return 1;
+    }
+
+    private static int sethealth(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        p.setHealth(FloatArgumentType.getFloat(context, "health"));
+
+        return 1;
+    }
+
+    private static int sethunger(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        HungerManager hm = p.getHungerManager();
+        hm.setFoodLevel(IntegerArgumentType.getInteger(context, "hunger"));
+
+        return 1;
+    }
+
+    private static int setsat(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+
+        HungerManager hm = p.getHungerManager();
+        hm.setSaturationLevel(FloatArgumentType.getFloat(context, "saturation"));
 
         return 1;
     }
