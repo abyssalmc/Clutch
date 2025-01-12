@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "clutch",
-	"version": "1.7",
+	"version": "1.8",
 	"name": "clutch",
 	"description": "Competitive clutching utils.",
 	"authors": [
