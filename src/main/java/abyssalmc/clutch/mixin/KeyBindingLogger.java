@@ -65,7 +65,7 @@ public class KeyBindingLogger {
                 if (ishotkey != 0){
                     if (GlobalDataHandler.getInputLocation() > 0){
                         double xdim = client.getWindow().getScaledWidth(), ydim = client.getWindow().getScaledHeight();
-                        double xscale = xdim/1920, yscale = ydim/1080;
+                        double xscale = xdim/client.getWindow().getWidth(), yscale = ydim/client.getWindow().getHeight();
                         int mouseX = (int) (xscale * client.mouse.getX()), mouseY = (int) (yscale * client.mouse.getY());
 
                         int overslot = 0;
