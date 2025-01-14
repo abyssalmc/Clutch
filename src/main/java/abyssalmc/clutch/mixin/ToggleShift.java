@@ -18,7 +18,7 @@ public abstract class ToggleShift {
     private static void toggleShiftGUI(long handle, int code, CallbackInfoReturnable<Boolean> cir) {
         if (MinecraftClient.getInstance().player != null){
             if (code == GLFW.GLFW_KEY_LEFT_SHIFT || code == GLFW.GLFW_KEY_RIGHT_SHIFT){
-                if (GlobalDataHandler.getToggleShift()){
+                if (GlobalDataHandler.getToggleShift() && !MinecraftClient.getInstance().options.getSneakToggled().getValue()){
                     if (toggleshiftstate){
                         cir.setReturnValue(true);
                     } else {

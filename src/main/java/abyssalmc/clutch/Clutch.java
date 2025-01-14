@@ -153,6 +153,8 @@ public class Clutch implements ModInitializer {
 	}
 
 	public static final Identifier CLOSE_GUI_PACKET_ID =  Identifier.of(MOD_ID, "close_gui");
+	public static final Identifier SET_SNEAKING_PACKET_ID =  Identifier.of(MOD_ID, "set_sneaking");
+	public static final Identifier SET_NOT_SNEAKING_PACKET_ID =  Identifier.of(MOD_ID, "set_not_sneaking");
 
 
 	@Override
@@ -170,6 +172,8 @@ public class Clutch implements ModInitializer {
 		MinecraftClient mc = MinecraftClient.getInstance();
 
 		PayloadTypeRegistry.playC2S().register(CloseGUIPayload.ID, CloseGUIPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(SetSneakingPayload.ID, SetSneakingPayload.CODEC);
+		PayloadTypeRegistry.playC2S().register(SetNotSneakingPayload.ID, SetNotSneakingPayload.CODEC);
 
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -179,6 +183,16 @@ public class Clutch implements ModInitializer {
 				context.server().execute(() -> {
 					closepass = true;
 					context.player().closeHandledScreen();
+				});
+			});
+			ServerPlayNetworking.registerGlobalReceiver(SetSneakingPayload.ID, (payload, context) -> {
+				context.server().execute(() -> {
+					context.player().setSneaking(true);
+				});
+			});
+			ServerPlayNetworking.registerGlobalReceiver(SetNotSneakingPayload.ID, (payload, context) -> {
+				context.server().execute(() -> {
+					context.player().setSneaking(false);
 				});
 			});
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
@@ -294,6 +308,7 @@ public class Clutch implements ModInitializer {
 						}
 					}
 				}
+
 
 
 				//INPUT LOC

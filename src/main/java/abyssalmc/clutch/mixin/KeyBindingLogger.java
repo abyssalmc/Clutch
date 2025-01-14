@@ -124,7 +124,17 @@ public class KeyBindingLogger {
             if (GlobalDataHandler.getToggleShift()){
                 if (action == GLFW.GLFW_PRESS){
                     if (GlobalDataHandler.getToggleShift()){
-                        toggleshiftstate = !toggleshiftstate;
+                        if (!client.options.getSneakToggled().getValue()){
+                            toggleshiftstate = !toggleshiftstate;
+                            ci.cancel();
+                        } else {
+                            client.player.sendMessage(Text.literal("§cToggle sneak must be disabled to use this feature. If this is a mistake, run /clutch toggleshift disable."));
+                        }
+
+                    }
+                } else {
+                    if (GlobalDataHandler.getToggleShift() && !client.options.getSneakToggled().getValue()){
+                        ci.cancel();
                     }
                 }
             }

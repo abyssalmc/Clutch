@@ -10,12 +10,9 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,7 +39,8 @@ public abstract class MouseCursorLocation {
     @Final
     protected Set<Slot> cursorDragSlots;
 
-    private boolean isDragging = false;
+    private int dragSlots = 0;
+    private int releaseDragSlots = 0;
 
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -74,6 +72,7 @@ public abstract class MouseCursorLocation {
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onKeyPressed(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
+
         switch (GlobalDataHandler.getCustomSounds()) {
             case 0:
                 break;
@@ -86,6 +85,8 @@ public abstract class MouseCursorLocation {
         }
 
         if (client.player != null && client.currentScreen != null) {
+            dragSlots = cursorDragSlots.size();
+
             if (GlobalDataHandler.getInputLocation() > 0) {
                 int overslot = 0;
                 for (Slot slot : ((HandledScreen<?>) client.currentScreen).getScreenHandler().slots) {
@@ -111,7 +112,10 @@ public abstract class MouseCursorLocation {
     private void onKeyReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
 
+
         if (client.player != null && client.currentScreen != null) {
+            releaseDragSlots = cursorDragSlots.size();
+
             if (GlobalDataHandler.getInputLocation() > 0) {
                 int overslot = 0;
                 for (Slot slot : ((HandledScreen<?>) client.currentScreen).getScreenHandler().slots) {
@@ -125,8 +129,10 @@ public abstract class MouseCursorLocation {
 
                 if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2) {
                     if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
-                        cxcoords.add((int) Math.floor(mouseX));
-                        cycoords.add((int) Math.floor(mouseY));
+                        if (dragSlots == releaseDragSlots){
+                            cxcoords.add((int) Math.floor(mouseX));
+                            cycoords.add((int) Math.floor(mouseY));
+                        }
                     }
                 }
             }

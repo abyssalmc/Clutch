@@ -499,7 +499,7 @@ public class ClutchCommand {
 
         GlobalDataHandler.setToggleShift(true);
 
-        p.sendMessage(Text.literal("§aToggle shift enabled (works in guis too)."));
+        p.sendMessage(Text.literal("§aToggle shift enabled (works in guis too). This only works if other toggle sneaks are disabled, including the vanilla one. There may also be issues using this on servers."));
         return 1;
     }
     private static int disabletoggleshift(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
