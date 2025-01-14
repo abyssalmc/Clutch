@@ -18,6 +18,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.CommandBlockExecutor;
 
 import static abyssalmc.clutch.Clutch.*;
 
@@ -238,8 +239,10 @@ public class ClutchCommand {
         cursorx = IntegerArgumentType.getInteger(context, "cursorX");
         cursory = IntegerArgumentType.getInteger(context, "cursorY");
 
-        p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."));
-        return 1;
+        if (context.getSource().isExecutedByPlayer()){
+            p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."));
+        }
+       return 1;
     }
 
     private static int disableOffset(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -247,7 +250,9 @@ public class ClutchCommand {
         PlayerEntity p = mc.player;
 
         offsetEnabled = false;
-        p.sendMessage(Text.literal("§aThe cursor will no longer offset."));
+        if (context.getSource().isExecutedByPlayer()){
+            p.sendMessage(Text.literal("§aThe cursor will no longer offset."));
+        }
         return 1;
     }
 
