@@ -34,7 +34,6 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("automov").then(CommandManager.literal("enable").executes(ClutchCommand::ae))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("automov").then(CommandManager.literal("disable").executes(ClutchCommand::ad))));
 
-
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("cursoroffset").then(CommandManager.argument("cursorX", IntegerArgumentType.integer()).then(CommandManager.argument("cursorY", IntegerArgumentType.integer()).executes(ClutchCommand::cursorOffset)))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("disableoffset").executes(ClutchCommand::disableOffset)));
 
@@ -66,6 +65,9 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("health").then(CommandManager.argument("health", FloatArgumentType.floatArg()).executes(ClutchCommand::sethealth))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("hunger").then(CommandManager.argument("hunger", IntegerArgumentType.integer()).executes(ClutchCommand::sethunger))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("saturation").then(CommandManager.argument("saturation", FloatArgumentType.floatArg()).executes(ClutchCommand::setsat))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("enable").executes(ClutchCommand::enabletoggleshift))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("disable").executes(ClutchCommand::disabletoggleshift))));
 
     }
 
@@ -488,6 +490,25 @@ public class ClutchCommand {
         HungerManager hm = p.getHungerManager();
         hm.setSaturationLevel(FloatArgumentType.getFloat(context, "saturation"));
 
+        return 1;
+    }
+
+    private static int enabletoggleshift(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        PlayerEntity p = mc.player;
+
+        GlobalDataHandler.setToggleShift(true);
+
+        p.sendMessage(Text.literal("§aToggle shift enabled (works in guis too)."));
+        return 1;
+    }
+    private static int disabletoggleshift(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        PlayerEntity p = mc.player;
+
+        GlobalDataHandler.setToggleShift(false);
+
+        p.sendMessage(Text.literal("§aToggle shift disabled."));
         return 1;
     }
 

@@ -18,7 +18,6 @@ public abstract class PreventCraftingGuiCloseScreenHandlerMixin extends ScreenHa
     protected PreventCraftingGuiCloseScreenHandlerMixin(ScreenHandlerType<?> type, int syncId) {
         super(type, syncId);
     }
-
     @Inject(method = "canUse", at = @At("HEAD"), cancellable = true)
     private void alwaysAllowUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
         if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){

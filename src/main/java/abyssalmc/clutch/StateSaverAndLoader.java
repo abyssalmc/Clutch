@@ -20,7 +20,6 @@ public class StateSaverAndLoader extends PersistentState {
         return nbt;
     }
 
-
     public static StateSaverAndLoader createFromNbt(NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
         StateSaverAndLoader state = new StateSaverAndLoader();
         state.platformcoords = tag.getString("platformpos");

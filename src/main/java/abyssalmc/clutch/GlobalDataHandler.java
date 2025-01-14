@@ -15,6 +15,7 @@ public class GlobalDataHandler {
     private static int inputlocation = 0;
     private static int inputlocator = 0;
     private static int customsounds = 0;
+    private static boolean toggleshift = false;
 
     public static void loadGlobalData() {
         try {
@@ -26,6 +27,7 @@ public class GlobalDataHandler {
                 inputlocation = nbt.getInt("inputlocation");
                 inputlocator = nbt.getInt("inputlocator");
                 customsounds = nbt.getInt("customsounds");
+                toggleshift = nbt.getBoolean("toggleshift");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,6 +45,7 @@ public class GlobalDataHandler {
             nbt.putInt("inputlocation", inputlocation);
             nbt.putInt("inputlocator", inputlocator);
             nbt.putInt("customsounds", customsounds);
+            nbt.putBoolean("toggleshift", toggleshift);
 
             NbtIo.write(nbt, GLOBAL_DATA_PATH);
         } catch (IOException e) {
@@ -57,6 +60,7 @@ public class GlobalDataHandler {
     public static int getInputLocation() { return inputlocation; }
     public static int getInputLocator() { return inputlocator; }
     public static int getCustomSounds() { return customsounds; }
+    public static boolean getToggleShift() { return toggleshift; }
 
 
     public static void setPitch(int gpitch) { pitch = gpitch; }
@@ -65,4 +69,5 @@ public class GlobalDataHandler {
     public static void setInputlocation(int ipl) { inputlocation = ipl; }
     public static void setInputlocator(int ipl) { inputlocator = ipl; }
     public static void setCustomSounds(int sound) { customsounds = sound; }
+    public static void setToggleShift(boolean b) { toggleshift = b; }
 }

@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +29,7 @@ import java.util.Set;
 import static abyssalmc.clutch.Clutch.*;
 
 @Mixin(HandledScreen.class)
-public abstract class MouseCursorLocation{
+public abstract class MouseCursorLocation {
     @Shadow
     protected int x;
     @Shadow
@@ -37,13 +38,11 @@ public abstract class MouseCursorLocation{
     @Shadow
     private Slot touchDragSlotStart;
 
-
     @Shadow
     @Final
     protected Set<Slot> cursorDragSlots;
 
     private boolean isDragging = false;
-
 
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -55,16 +54,16 @@ public abstract class MouseCursorLocation{
             guiy = y;
 
             int index = 0;
-            for (int x : cxcoords){
-                switch (GlobalDataHandler.getInputLocator()){
+            for (int x : cxcoords) {
+                switch (GlobalDataHandler.getInputLocator()) {
                     case 0:
-                        context.drawText(client.inGameHud.getTextRenderer(), "⋅", x, cycoords.get(index)-4, 0xFF0000, true);
+                        context.drawText(client.inGameHud.getTextRenderer(), "⋅", x, cycoords.get(index) - 4, 0xFF0000, true);
                         break;
                     case 1:
-                        context.drawText(client.inGameHud.getTextRenderer(), "◦", x-1, cycoords.get(index)-3, 0xFF0000, true);
+                        context.drawText(client.inGameHud.getTextRenderer(), "◦", x - 1, cycoords.get(index) - 3, 0xFF0000, true);
                         break;
                     case 2:
-                        context.drawText(client.inGameHud.getTextRenderer(), "₊", x-1, cycoords.get(index)-5, 0xFF0000, true);
+                        context.drawText(client.inGameHud.getTextRenderer(), "₊", x - 1, cycoords.get(index) - 5, 0xFF0000, true);
                         break;
                 }
                 index++;
@@ -75,7 +74,7 @@ public abstract class MouseCursorLocation{
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onKeyPressed(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
-        switch (GlobalDataHandler.getCustomSounds()){
+        switch (GlobalDataHandler.getCustomSounds()) {
             case 0:
                 break;
             case 1:
@@ -87,7 +86,7 @@ public abstract class MouseCursorLocation{
         }
 
         if (client.player != null && client.currentScreen != null) {
-            if (GlobalDataHandler.getInputLocation() > 0){
+            if (GlobalDataHandler.getInputLocation() > 0) {
                 int overslot = 0;
                 for (Slot slot : ((HandledScreen<?>) client.currentScreen).getScreenHandler().slots) {
                     int slotX = guix + slot.x;
@@ -98,9 +97,37 @@ public abstract class MouseCursorLocation{
                     }
                 }
 
-                if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2){
-                    cxcoords.add((int)Math.floor(mouseX));
-                    cycoords.add((int)Math.floor(mouseY));
+                if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2) {
+                    if (client.player.currentScreenHandler.getCursorStack().isEmpty()) {
+                        cxcoords.add((int) Math.floor(mouseX));
+                        cycoords.add((int) Math.floor(mouseY));
+                    }
+                }
+            }
+        }
+    }
+
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
+    private void onKeyReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        MinecraftClient client = MinecraftClient.getInstance();
+
+        if (client.player != null && client.currentScreen != null) {
+            if (GlobalDataHandler.getInputLocation() > 0) {
+                int overslot = 0;
+                for (Slot slot : ((HandledScreen<?>) client.currentScreen).getScreenHandler().slots) {
+                    int slotX = guix + slot.x;
+                    int slotY = guiy + slot.y;
+
+                    if (mouseX >= slotX - 1 && mouseX <= slotX + 17 && mouseY >= slotY - 1 && mouseY <= slotY + 16) {
+                        overslot++;
+                    }
+                }
+
+                if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2) {
+                    if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
+                        cxcoords.add((int) Math.floor(mouseX));
+                        cycoords.add((int) Math.floor(mouseY));
+                    }
                 }
             }
         }

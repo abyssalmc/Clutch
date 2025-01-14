@@ -80,6 +80,8 @@ public class Clutch implements ModInitializer {
 	public static boolean lastoverplate = false;
 
 	public static boolean closepass = false;
+
+	public static boolean toggleshiftstate = false;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 

@@ -20,6 +20,7 @@ public class CursorOffset {
         if (screen instanceof CraftingScreen) {
             if (offsetEnabled) {
                 unlockAndSetCursor(cursorx, cursory);
+                offsetEnabled = false;
             }
         }
     }
