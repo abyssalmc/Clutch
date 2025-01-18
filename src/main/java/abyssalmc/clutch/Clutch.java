@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import net.minecraft.util.hit.BlockHitResult;
@@ -82,6 +83,7 @@ public class Clutch implements ModInitializer {
 	public static boolean closepass = false;
 
 	public static boolean toggleshiftstate = false;
+	public static boolean recursion = false;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 
@@ -288,20 +290,30 @@ public class Clutch implements ModInitializer {
 				}
 				lastTickTime = currentTime;
 
+
+
 				//AUTO MOVEMENT
 				if (client.isIntegratedServerRunning() && client.getServer() != null){
 					StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
 					if (GlobalDataHandler.getAutomov() && !serverState.platformcoords.equals("unset")){
 						if (automovementcountdown > 0){
-							if (automovementcountdown < 15){
-								if (automovementcountdown == 14){
-									p.setVelocity(p.getVelocity().getX(),0.42,p.getVelocity().getZ());
+							if (automovementcountdown <= 11){
+								if (automovementcountdown == 11){
+									client.player.setVelocity(0,0,0);
+									String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+									client.getNetworkHandler().sendChatCommand(cmd);
+									client.options.jumpKey.setPressed(false);
+								}
+								if (client.currentScreen == null) {
+									client.options.backKey.setPressed(true);
+								}
+								if (automovementcountdown == 2){
+									client.options.backKey.setPressed(false);
 									client.options.jumpKey.setPressed(true);
 								}
-								if (client.currentScreen == null) {client.options.backKey.setPressed(true);}
-								if (automovementcountdown == 1){
-									client.options.backKey.setPressed(false);
+								if (automovementcountdown == 1) {
 									client.options.jumpKey.setPressed(false);
+									client.options.backKey.setPressed(false);
 								}
 							}
 							automovementcountdown--;

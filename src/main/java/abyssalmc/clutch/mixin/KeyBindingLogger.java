@@ -79,8 +79,8 @@ public class KeyBindingLogger {
 
                         if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2){
                             if (ishotkey > 0){
-                                cxcoords.add((int)Math.round(mouseX));
-                                cycoords.add((int)Math.round(mouseY));
+                                cxcoords.add(Math.round(mouseX));
+                                cycoords.add(Math.round(mouseY));
                             }
                         }
                     }
@@ -98,14 +98,16 @@ public class KeyBindingLogger {
                             ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
                         }
 
-                        automovementcountdown = 15;
+                        automovementcountdown = 11;
                         if (GlobalDataHandler.getAutomov()) {
                             client.options.jumpKey.setPressed(false);
                             client.options.backKey.setPressed(false);
+                            client.options.forwardKey.setPressed(false);
                         }
 
                         StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
                         if (!serverState.platformcoords.equals("unset")) {
+                            client.player.setVelocity(0,0,0);
                             String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
                             client.getNetworkHandler().sendChatCommand(cmd);
                         }

@@ -33,9 +33,6 @@ public abstract class MouseCursorLocation {
     protected int y;
 
     @Shadow
-    private Slot touchDragSlotStart;
-
-    @Shadow
     @Final
     protected Set<Slot> cursorDragSlots;
 
@@ -93,7 +90,7 @@ public abstract class MouseCursorLocation {
                     int slotX = guix + slot.x;
                     int slotY = guiy + slot.y;
 
-                    if (mouseX >= slotX - 1 && mouseX <= slotX + 17 && mouseY >= slotY - 1 && mouseY <= slotY + 16) {
+                    if (mouseX >= slotX - 1 && mouseX <= slotX + 17 && mouseY >= slotY - 1 && mouseY <= slotY + 17) {
                         overslot++;
                     }
                 }
@@ -122,7 +119,7 @@ public abstract class MouseCursorLocation {
                     int slotX = guix + slot.x;
                     int slotY = guiy + slot.y;
 
-                    if (mouseX >= slotX - 1 && mouseX <= slotX + 17 && mouseY >= slotY - 1 && mouseY <= slotY + 16) {
+                    if (mouseX >= slotX - 1 && mouseX <= slotX + 17 && mouseY >= slotY - 1 && mouseY <= slotY + 17) {
                         overslot++;
                     }
                 }

@@ -12,11 +12,13 @@ public class StateSaverAndLoader extends PersistentState {
 
     public String platformcoords = "unset";
     public String platformattempts = "";
+    public Boolean projectilerng = true;
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         nbt.putString("platformpos", platformcoords);
         nbt.putString("platformattempts", platformattempts);
+        nbt.putBoolean("projectilerng", projectilerng);
         return nbt;
     }
 
@@ -24,6 +26,7 @@ public class StateSaverAndLoader extends PersistentState {
         StateSaverAndLoader state = new StateSaverAndLoader();
         state.platformcoords = tag.getString("platformpos");
         state.platformattempts = tag.getString("platformattempts");
+        state.projectilerng = tag.getBoolean("projectilerng");
         return state;
     }
 

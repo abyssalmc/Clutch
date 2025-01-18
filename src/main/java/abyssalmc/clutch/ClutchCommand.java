@@ -70,6 +70,9 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("enable").executes(ClutchCommand::enabletoggleshift))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("disable").executes(ClutchCommand::disabletoggleshift))));
 
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("enable").executes(ClutchCommand::enableprojectilerng))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("disable").executes(ClutchCommand::disableprojectilerng))));
+
     }
 
 
@@ -514,6 +517,33 @@ public class ClutchCommand {
         GlobalDataHandler.setToggleShift(false);
 
         p.sendMessage(Text.literal("§aToggle shift disabled."));
+        return 1;
+    }
+
+    private static int enableprojectilerng(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        if (client.isIntegratedServerRunning() && client.getServer() != null) {
+            StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+            p.sendMessage(Text.literal("§aProjectiles will now have rng on this world."));
+            serverState.projectilerng = true;
+        } else {
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+        }
+        return 1;
+    }
+    private static int disableprojectilerng(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        if (client.isIntegratedServerRunning() && client.getServer() != null) {
+            StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+            p.sendMessage(Text.literal("§aProjectiles will no longer have rng on this world."));
+            serverState.projectilerng = false;
+        } else {
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+        }
         return 1;
     }
 
