@@ -4,21 +4,38 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.ToolItem;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.CommandBlockExecutor;
+
+import java.util.List;
 
 import static abyssalmc.clutch.Clutch.*;
 
@@ -73,6 +90,11 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("enable").executes(ClutchCommand::enableprojectilerng))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("disable").executes(ClutchCommand::disableprojectilerng))));
 
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("setupgen").then(CommandManager.argument("setup id", StringArgumentType.string()).executes(ClutchCommand::setup))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("stalls").then(CommandManager.literal("enable").executes(ClutchCommand::enablestalls))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("stalls").then(CommandManager.literal("disable").executes(ClutchCommand::disablestalls))));
+
     }
 
 
@@ -102,17 +124,17 @@ public class ClutchCommand {
             double xshift = 0;
             double zshift = 0;
 
-            if (mc.world.getBlockState(base.south()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 180;tables++;}
-            if (mc.world.getBlockState(base.west()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 270;tables++;}
-            if (mc.world.getBlockState(base.north()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 0;tables++;}
-            if (mc.world.getBlockState(base.east()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 90;tables++;}
+            if (mc.world.getBlockState(base.south()).createScreenHandlerFactory(mc.world, base.south()) != null){yaw = 180;tables++;}
+            if (mc.world.getBlockState(base.west()).createScreenHandlerFactory(mc.world, base.west()) != null){yaw = 270;tables++;}
+            if (mc.world.getBlockState(base.north()).createScreenHandlerFactory(mc.world, base.north()) != null){yaw = 0;tables++;}
+            if (mc.world.getBlockState(base.east()).createScreenHandlerFactory(mc.world, base.east()) != null){yaw = 90;tables++;}
 
             if (tables == 0){
-                p.sendMessage(Text.literal("§cThere must be a crafting table adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"));
                 configured = false;
             }
             if (tables >= 2){
-                p.sendMessage(Text.literal("§cThere can only be one crafting table adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"));
                 configured = false;
             }
             if (tables == 1){
@@ -170,17 +192,17 @@ public class ClutchCommand {
             double xshift = 0;
             double zshift = 0;
 
-            if (mc.world.getBlockState(base.south()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 180;tables++;zshift=offset;}
-            if (mc.world.getBlockState(base.west()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 270;tables++;xshift=-offset;}
-            if (mc.world.getBlockState(base.north()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 0;tables++;zshift=-offset;}
-            if (mc.world.getBlockState(base.east()).getBlock() == Blocks.CRAFTING_TABLE){yaw = 90;tables++;xshift=offset;}
+            if (mc.world.getBlockState(base.south()).createScreenHandlerFactory(mc.world, base.south()) != null){yaw = 180;tables++;zshift=offset;}
+            if (mc.world.getBlockState(base.west()).createScreenHandlerFactory(mc.world, base.west()) != null){yaw = 270;tables++;xshift=-offset;}
+            if (mc.world.getBlockState(base.north()).createScreenHandlerFactory(mc.world, base.north()) != null){yaw = 0;tables++;zshift=-offset;}
+            if (mc.world.getBlockState(base.east()).createScreenHandlerFactory(mc.world, base.east()) != null){yaw = 90;tables++;xshift=offset;}
 
             if (tables == 0){
-                p.sendMessage(Text.literal("§cThere must be a crafting table adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"));
                 configured = false;
             }
             if (tables >= 2){
-                p.sendMessage(Text.literal("§cThere can only be one crafting table adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"));
                 configured = false;
             }
             if (tables == 1){
@@ -547,4 +569,111 @@ public class ClutchCommand {
         return 1;
     }
 
+
+    private static int setup(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        String setupid = StringArgumentType.getString(context, "setup id");
+
+        BlockPos platform = new BlockPos(context.getSource().getPlayer().getBlockPos().getX(), context.getSource().getPlayer().getBlockPos().getY(), context.getSource().getPlayer().getBlockPos().getZ());
+
+        // ITEM READER
+        String[] itemlist = setupid.split("S");
+        BlockPos cmd = platform.add(0,-2,0);
+        context.getSource().getServer().getCommandManager().getDispatcher().execute("gamerule sendCommandFeedback false", context.getSource());
+        context.getSource().getServer().getCommandManager().getDispatcher().execute("gamerule commandBlockOutput false", context.getSource());
+        context.getSource().getServer().getCommandManager().getDispatcher().execute("setblock " + cmd.getX() + " " +  cmd.getY() + " " + cmd.getZ() + " command_block[facing=down]{auto:1b,Command:\"clear @p\"}", context.getSource());
+
+        for (String item : itemlist) {
+            cmd = cmd.add(0,-1,0);
+            String invslot = "";
+
+            String itemname;
+            int itemcount;
+            if (Character.isDigit(item.charAt(0))) {
+                String[] splitproc1 = item.split("(?<=\\d)(?=\\D)", 2);
+
+                int itemslot = Integer.parseInt(splitproc1[0]);
+                String[] splitproc2 = splitproc1[1].split("(?=\\d+$)", 2);
+                itemname = splitproc2[0];
+
+                invslot = "container." + itemslot;
+
+                itemcount = Integer.parseInt(splitproc2[1]);
+            }else{
+                String itemslot = item.substring(0, 1);
+
+                String splitproc1 = item.substring(1);
+                String[] splitproc2 = splitproc1.split("(?=\\d+$)", 2);
+                itemname = splitproc2[0];
+                itemcount = Integer.parseInt(splitproc2[1]);
+
+                if (itemslot.contains("h")) {
+                    invslot = "armor.head";
+                }
+                if (itemslot.contains("c")) {
+                    invslot = "armor.chest";
+                }
+                if (itemslot.contains("l")) {
+                    invslot = "armor.legs";
+                }
+                if (itemslot.contains("f")) {
+                    invslot = "armor.feet";
+                }
+                if (itemslot.contains("o")) {
+                    invslot = "weapon.offhand";
+                }
+            }
+
+            String itemclause = itemname;
+
+            Identifier itemId = Identifier.tryParse("minecraft", itemname);
+
+            Item regitem = Registries.ITEM.get(itemId);
+            ItemStack itemstack = new ItemStack(regitem, 1);
+
+            if (itemname.contains("E")) {
+                String[] enchitem = itemname.split("E");
+                itemname = enchitem[0];
+
+                String[] itemench = enchitem[1].split("(?=\\d+$)", 2);
+                String enchtype = itemench[0];
+                String enchlevel = itemench[1];
+
+                if (itemname.contains("enchanted_book")){
+                    itemclause = itemname + "[stored_enchantments={levels:{\\\"minecraft:" + enchtype + "\\\":" + enchlevel + "}}]";
+                } else {
+                    itemclause = itemname + "[enchantments={levels:{\\\"minecraft:" + enchtype + "\\\":" + enchlevel + "}}]";
+                }
+            }
+
+            context.getSource().getServer().getCommandManager().getDispatcher().execute("setblock " + cmd.getX() + " " +  cmd.getY() + " " + cmd.getZ() + " chain_command_block[facing=down]{auto:1b,Command:\"item replace entity @p " + invslot + " with " + itemclause + " " + itemcount + "\"}", context.getSource());
+
+        }
+
+        return 1;
+    }
+
+    private static int enablestalls(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        if (client.isIntegratedServerRunning() && client.getServer() != null) {
+            p.sendMessage(Text.literal("§aStalls are now enabled."));
+            GlobalDataHandler.setStalls(true);
+        } else {
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+        }
+        return 1;
+    }
+    private static int disablestalls(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        if (client.isIntegratedServerRunning() && client.getServer() != null) {
+            p.sendMessage(Text.literal("§aStalls are now disabled."));
+            GlobalDataHandler.setStalls(false);
+        } else {
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+        }
+        return 1;
+    }
 }

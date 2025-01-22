@@ -8,6 +8,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -18,6 +20,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -25,6 +29,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -34,10 +39,12 @@ import org.slf4j.LoggerFactory;
 
 import abyssalmc.clutch.event.keyinputhandler;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import static abyssalmc.clutch.event.keyinputhandler.*;
+import static net.minecraft.entity.damage.DamageTypes.FALL;
 
 public class Clutch implements ModInitializer {
 
@@ -61,7 +68,6 @@ public class Clutch implements ModInitializer {
 
 	public static int automovementcountdown = 0;
 
-	public static final Identifier PLATFORM_POS = Identifier.of(MOD_ID, "platform_pos");
 
 	private double lastTickTime = 0;
 	public static List<Double> tickavg = new ArrayList<>(){};
@@ -84,6 +90,7 @@ public class Clutch implements ModInitializer {
 
 	public static boolean toggleshiftstate = false;
 	public static boolean recursion = false;
+	public static double currenty = 0;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 
@@ -157,6 +164,7 @@ public class Clutch implements ModInitializer {
 	public static final Identifier CLOSE_GUI_PACKET_ID =  Identifier.of(MOD_ID, "close_gui");
 	public static final Identifier SET_SNEAKING_PACKET_ID =  Identifier.of(MOD_ID, "set_sneaking");
 	public static final Identifier SET_NOT_SNEAKING_PACKET_ID =  Identifier.of(MOD_ID, "set_not_sneaking");
+	public static final Identifier PY_PACKET_ID =  Identifier.of(MOD_ID, "player_y");
 
 
 	@Override
@@ -198,6 +206,11 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+				//STALL
+				if (canParseDouble(new DecimalFormat("#.####").format(p.getY()))){
+					currenty = Double.parseDouble(new DecimalFormat("#.####").format(p.getY()));
+				}
+
 				//ATTEMPT COUNTER
 				overplate = false;
 				BlockPos platepos = new BlockPos(0,0,0);
@@ -426,11 +439,8 @@ public class Clutch implements ModInitializer {
 						bladderv = 5;
 						hayv = 4;
 					}
-
-
 				}
 			}
-
 		});
 
 
@@ -445,6 +455,27 @@ public class Clutch implements ModInitializer {
 			}
 		});
 
+		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+			if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+				if (GlobalDataHandler.getStalls()){
+					if (entity instanceof PlayerEntity && source.getType().toString().contains("deathMessageType=FALL_VARIANTS]")) {
+						double servery = -9999;
+						if (canParseDouble(new DecimalFormat("#.####").format(entity.getY()))){
+							servery = Double.parseDouble(new DecimalFormat("#.####").format(entity.getY()));
+
+						}
+
+						if (((servery >= currenty && (servery == currenty || (servery - currenty) > 0.6)) || (servery < currenty && currenty-servery < 0.6)) && MinecraftClient.getInstance().options.jumpKey.isPressed()) {
+							//entity.sendMessage(Text.literal("stall triggered. client height: " + currenty + ", server height: " + servery + "."));
+
+							return false;
+
+						}
+					}
+				}
+			}
+			return true;
+		});
 
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
 			if (showclutch){
@@ -472,7 +503,14 @@ public class Clutch implements ModInitializer {
 				if (boatcrouch && boattot>=1){drawContext.drawTexture(arrow, 40, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
 			}
 		});
-
 	}
 
+	public boolean canParseDouble(String input) {
+		try {
+			Double.parseDouble(input);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
 }
