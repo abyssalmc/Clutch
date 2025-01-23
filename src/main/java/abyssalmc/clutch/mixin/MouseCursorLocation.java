@@ -100,6 +100,9 @@ public abstract class MouseCursorLocation {
                         cxcoords.add((int) Math.floor(mouseX));
                         cycoords.add((int) Math.floor(mouseY));
                     }
+                    slotclick = false;
+                } else {
+                    slotclick = true;
                 }
             }
         }
@@ -127,8 +130,10 @@ public abstract class MouseCursorLocation {
                 if (overslot == 0 || GlobalDataHandler.getInputLocation() == 2) {
                     if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
                         if (dragSlots == releaseDragSlots){
-                            cxcoords.add((int) Math.floor(mouseX));
-                            cycoords.add((int) Math.floor(mouseY));
+                            if (!slotclick){
+                                cxcoords.add((int) Math.floor(mouseX));
+                                cycoords.add((int) Math.floor(mouseY));
+                            }
                         }
                     }
                 }

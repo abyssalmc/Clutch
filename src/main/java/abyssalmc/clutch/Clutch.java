@@ -91,6 +91,7 @@ public class Clutch implements ModInitializer {
 	public static boolean toggleshiftstate = false;
 	public static boolean recursion = false;
 	public static double currenty = 0;
+    public static boolean slotclick = false;
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 

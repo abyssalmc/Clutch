@@ -28,6 +28,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
@@ -94,6 +95,8 @@ public class ClutchCommand {
 
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("stalls").then(CommandManager.literal("enable").executes(ClutchCommand::enablestalls))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("stalls").then(CommandManager.literal("disable").executes(ClutchCommand::disablestalls))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("extinguish").executes(ClutchCommand::extinguish)));
 
     }
 
@@ -264,7 +267,7 @@ public class ClutchCommand {
         cursorx = IntegerArgumentType.getInteger(context, "cursorX");
         cursory = IntegerArgumentType.getInteger(context, "cursorY");
 
-        if (context.getSource().isExecutedByPlayer()){
+        if (context.getSource().isExecutedByPlayer() && context.getSource().getEntity() instanceof ServerPlayerEntity){
             p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."));
         }
        return 1;
@@ -580,7 +583,7 @@ public class ClutchCommand {
         BlockPos cmd = platform.add(0,-2,0);
         context.getSource().getServer().getCommandManager().getDispatcher().execute("gamerule sendCommandFeedback false", context.getSource());
         context.getSource().getServer().getCommandManager().getDispatcher().execute("gamerule commandBlockOutput false", context.getSource());
-        context.getSource().getServer().getCommandManager().getDispatcher().execute("setblock " + cmd.getX() + " " +  cmd.getY() + " " + cmd.getZ() + " command_block[facing=down]{auto:1b,Command:\"clear @p\"}", context.getSource());
+        context.getSource().getServer().getCommandManager().getDispatcher().execute("setblock " + cmd.getX() + " " +  cmd.getY() + " " + cmd.getZ() + " command_block[facing=down]{auto:0b,Command:\"clear @p\"}", context.getSource());
 
         for (String item : itemlist) {
             cmd = cmd.add(0,-1,0);
@@ -674,6 +677,14 @@ public class ClutchCommand {
         } else {
             p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
         }
+        return 1;
+    }
+
+    private static int extinguish(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.setOnFire(false);
         return 1;
     }
 }
