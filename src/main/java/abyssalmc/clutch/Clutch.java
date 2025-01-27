@@ -95,6 +95,7 @@ public class Clutch implements ModInitializer {
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 
+
 			Vec3d eyePosition = player.getCameraPosVec(1.0F);
 			Vec3d lookVector = player.getRotationVec(1.0F);
 			Vec3d endVec = eyePosition.add(lookVector.multiply(maxDistance));
@@ -170,6 +171,7 @@ public class Clutch implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+
 		GlobalDataHandler.loadGlobalData();
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> GlobalDataHandler.saveGlobalData());
 
@@ -207,6 +209,8 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+				p.sendMessage(Text.literal(client.mouse.getX()+""));
+
 				//STALL
 				if (canParseDouble(new DecimalFormat("#.####").format(p.getY()))){
 					currenty = Double.parseDouble(new DecimalFormat("#.####").format(p.getY()));

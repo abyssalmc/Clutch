@@ -1,36 +1,51 @@
 package abyssalmc.clutch.mixin;
 
+import abyssalmc.clutch.StateSaverAndLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.util.InputUtil;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static abyssalmc.clutch.Clutch.*;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Mouse.class)
 public class CursorOffset {
-    @Inject(method = "setScreen", at = @At("HEAD"))
-    private void onSetScreen(Screen screen, CallbackInfo ci) {
-        if (screen instanceof CraftingScreen) {
-            if (offsetEnabled) {
-                unlockAndSetCursor(cursorx, cursory);
-                offsetEnabled = false;
-            }
-        }
+
+    @Shadow
+    private double x;
+
+    @Shadow
+    private double y;
+
+    @Shadow
+    private boolean cursorLocked;
+
+    private boolean locked = false;
+
+
+    @Inject(method = "unlockCursor", at = @At("HEAD"), cancellable = true)
+    private void checkLocked(CallbackInfo ci) {
+        locked = this.cursorLocked;
     }
 
-    private void unlockAndSetCursor(double x, double y) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        Mouse mouse = client.mouse;
-        mouse.unlockCursor();
+    @Inject(method = "unlockCursor", at = @At("TAIL"), cancellable = true)
+    private void unlockPos(CallbackInfo ci) {
+        if (locked){
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (offsetEnabled)
+            {
+                this.x = cursorx;
+                this.y = cursory;
+                InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
+                offsetEnabled = false;
+            }
 
-        long windowHandle = client.getWindow().getHandle();
-        InputUtil.setCursorParameters(windowHandle, GLFW.GLFW_CURSOR_NORMAL, x, y);
+        }
     }
 }
