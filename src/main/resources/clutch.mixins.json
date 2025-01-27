@@ -3,7 +3,7 @@
 	"package": "abyssalmc.clutch.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"CursorOffset", "ModEntityDataSaver", "RecipeDisabler", "hotbar", "MouseCursorLocation", "KeyBindingLogger", "GUICloseCancel", "GUIOpenListener", "PreventCraftingGuiCloseScreenHandlerMixin", "ToggleShift", "ProjectileRNG", "FireworkRNG"
+		"CursorOffset", "ModEntityDataSaver", "RecipeDisabler", "hotbar", "MouseCursorLocation", "KeyBindingLogger", "GUICloseCancel", "GUIOpenListener", "PreventCraftingGuiCloseScreenHandlerMixin", "ToggleShift", "ProjectileRNG", "FireworkRNG", "FallDamageParticles"
 	],
 	"injectors": {
 		"defaultRequire": 1

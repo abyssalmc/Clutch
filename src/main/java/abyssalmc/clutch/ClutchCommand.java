@@ -98,6 +98,9 @@ public class ClutchCommand {
 
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("extinguish").executes(ClutchCommand::extinguish)));
 
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("fallparticles").then(CommandManager.literal("enable").executes(ClutchCommand::enablefallparticles))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("fallparticles").then(CommandManager.literal("disable").executes(ClutchCommand::disablefallparticles))));
+
     }
 
 
@@ -685,6 +688,24 @@ public class ClutchCommand {
         PlayerEntity p = client.player;
 
         p.setOnFire(false);
+        return 1;
+    }
+
+
+    private static int enablefallparticles(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aFall damage particles are now enabled."));
+        GlobalDataHandler.setFallParticles(true);
+        return 1;
+    }
+    private static int disablefallparticles(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aFall damage particles are now disabled."));
+        GlobalDataHandler.setFallParticles(false);
         return 1;
     }
 }
