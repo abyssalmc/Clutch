@@ -209,8 +209,6 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
-				p.sendMessage(Text.literal(client.mouse.getX()+""));
-
 				//STALL
 				if (canParseDouble(new DecimalFormat("#.####").format(p.getY()))){
 					currenty = Double.parseDouble(new DecimalFormat("#.####").format(p.getY()));
