@@ -140,4 +140,11 @@ public abstract class MouseCursorLocation {
             }
         }
     }
+
+    @Inject(method = "close", at = @At("HEAD"), cancellable = true)
+    private void closeScreen(CallbackInfo ci) {
+        if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen || MinecraftClient.getInstance().currentScreen instanceof InventoryScreen) {
+
+        }
+    }
 }

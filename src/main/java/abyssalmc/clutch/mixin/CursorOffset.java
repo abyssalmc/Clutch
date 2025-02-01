@@ -3,6 +3,8 @@ package abyssalmc.clutch.mixin;
 import abyssalmc.clutch.StateSaverAndLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -36,16 +38,15 @@ public class CursorOffset {
 
     @Inject(method = "unlockCursor", at = @At("TAIL"), cancellable = true)
     private void unlockPos(CallbackInfo ci) {
-        if (locked){
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (offsetEnabled)
-            {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof InventoryScreen){
+            if (offsetEnabled){
                 this.x = cursorx;
                 this.y = cursory;
                 InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
                 offsetEnabled = false;
+                ci.cancel();
             }
-
         }
     }
 }

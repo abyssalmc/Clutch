@@ -191,6 +191,9 @@ public class Clutch implements ModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			PlayerEntity p = mc.player;
+			if (p != null){
+				p.sendMessage(Text.literal(mc.mouse.getX() + " // " + mc.mouse.getY()));
+			}
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
