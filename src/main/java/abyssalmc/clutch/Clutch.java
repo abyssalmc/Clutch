@@ -23,6 +23,8 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -77,6 +79,7 @@ public class Clutch implements ModInitializer {
 	public static List<Integer> cxcoords = new ArrayList<>();
 	public static List<Integer> cycoords = new ArrayList<>();
 
+	public static int updateslot = -1;
 
 	public static int guix = 0;
 	public static int guiy = 0;
@@ -191,9 +194,6 @@ public class Clutch implements ModInitializer {
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			PlayerEntity p = mc.player;
-			if (p != null){
-				p.sendMessage(Text.literal(mc.mouse.getX() + " // " + mc.mouse.getY()));
-			}
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
@@ -212,6 +212,13 @@ public class Clutch implements ModInitializer {
 				});
 			});
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+				//SLOT CHANGE
+				if (updateslot >= 0){
+					p.getInventory().selectedSlot = updateslot;
+					MinecraftClient.getInstance().getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(updateslot));
+					updateslot = -1;
+				}
+
 				//STALL
 				if (canParseDouble(new DecimalFormat("#.####").format(p.getY()))){
 					currenty = Double.parseDouble(new DecimalFormat("#.####").format(p.getY()));

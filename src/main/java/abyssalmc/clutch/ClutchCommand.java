@@ -24,6 +24,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -96,6 +98,7 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("fallparticles").then(CommandManager.literal("enable").executes(ClutchCommand::enablefallparticles))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("fallparticles").then(CommandManager.literal("disable").executes(ClutchCommand::disablefallparticles))));
 
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("slot").then(CommandManager.argument("slot", IntegerArgumentType.integer()).executes(ClutchCommand::setslot))));
     }
 
 
@@ -702,6 +705,18 @@ public class ClutchCommand {
 
         p.sendMessage(Text.literal("§aFall damage particles are now disabled."));
         GlobalDataHandler.setFallParticles(false);
+        return 1;
+    }
+
+    private static int setslot(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        PlayerEntity p = context.getSource().getPlayer();
+        int slot = IntegerArgumentType.getInteger(context, "slot");
+        if (0 <= slot && slot <= 8){
+            updateslot = slot;
+        } else {
+            p.sendMessage(Text.literal("§cThe slot index must be between 0-8."));
+        }
+
         return 1;
     }
 }
