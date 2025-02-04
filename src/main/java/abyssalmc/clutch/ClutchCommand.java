@@ -35,6 +35,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import static abyssalmc.clutch.Clutch.*;
 
 public class ClutchCommand {
@@ -268,11 +272,12 @@ public class ClutchCommand {
         cursorx = IntegerArgumentType.getInteger(context, "cursorX");
         cursory = IntegerArgumentType.getInteger(context, "cursorY");
 
-
         if (context.getSource().isExecutedByPlayer() && context.getSource().getEntity() instanceof ServerPlayerEntity){
             p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."));
         }
-       return 1;
+
+
+        return 1;
     }
 
     private static int disableOffset(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

@@ -22,6 +22,7 @@ public class GUIOpenListener {
             tempguitime = guitime;
             cxcoords = new ArrayList<>();
             cycoords = new ArrayList<>();
+
             //MinecraftClient.getInstance().mouse.lockCursor();
             //InputUtil.setCursorParameters(MinecraftClient.getInstance().getWindow().getHandle(), 212993, cursorx, cursory);
             //MinecraftClient.getInstance().mouse.unlockCursor();

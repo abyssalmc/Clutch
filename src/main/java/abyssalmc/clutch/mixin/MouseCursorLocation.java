@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
@@ -38,6 +39,7 @@ public abstract class MouseCursorLocation {
 
     private int dragSlots = 0;
     private int releaseDragSlots = 0;
+    private boolean lastFirstFrame = false;
 
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -144,7 +146,6 @@ public abstract class MouseCursorLocation {
     @Inject(method = "close", at = @At("HEAD"), cancellable = true)
     private void closeScreen(CallbackInfo ci) {
         if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen || MinecraftClient.getInstance().currentScreen instanceof InventoryScreen) {
-
         }
     }
 }

@@ -8,6 +8,8 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,6 +37,10 @@ public class CursorOffset {
     private void checkLocked(CallbackInfo ci) {
         locked = this.cursorLocked;
     }
+    @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
+    private void checkLocked2(CallbackInfo ci) {
+        locked = this.cursorLocked;
+    }
 
     @Inject(method = "unlockCursor", at = @At("TAIL"), cancellable = true)
     private void unlockPos(CallbackInfo ci) {
@@ -44,9 +50,21 @@ public class CursorOffset {
                 this.x = cursorx;
                 this.y = cursory;
                 InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
+                client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
                 offsetEnabled = false;
                 ci.cancel();
             }
+        }
+    }
+
+    @Inject(method = "lockCursor", at = @At("TAIL"), cancellable = true)
+    private void lockPos(CallbackInfo ci) {
+        if (offsetEnabled){
+            MinecraftClient client = MinecraftClient.getInstance();
+            this.x = cursorx;
+            this.y = cursory;
+            InputUtil.setCursorParameters(client.getWindow().getHandle(), 212995, this.x, this.y);
+            client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
         }
     }
 }
