@@ -99,6 +99,10 @@ public class Clutch implements ModInitializer {
 	public static boolean recursion = false;
 	public static double currenty = 0;
     public static boolean slotclick = false;
+
+	public static double timestart = 0;
+	public static boolean timeextension = false;
+
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
 
@@ -201,8 +205,12 @@ public class Clutch implements ModInitializer {
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
-					closepass = true;
-					context.player().closeHandledScreen();
+					if (context.player().getVelocity().y < 0 && !context.player().isOnGround())
+					{
+						closepass = true;
+						context.player().closeHandledScreen();
+					}
+
 				});
 			});
 			ServerPlayNetworking.registerGlobalReceiver(SetSneakingPayload.ID, (payload, context) -> {
@@ -293,7 +301,8 @@ public class Clutch implements ModInitializer {
 						tempguitime -= 1;
 					}
 					if (guitime != 0 && tempguitime == 0 && client.currentScreen instanceof CraftingScreen){
-
+						double opentime = (System.currentTimeMillis()-timestart);
+						//p.sendMessage(Text.literal("GUI TIME: " + opentime));
 						ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
 					}
 					if (isKeyPressed(InputUtil.fromTranslationKey(client.options.inventoryKey.getBoundKeyTranslationKey()).getCode()) || isKeyPressed(GLFW.GLFW_KEY_ESCAPE)){

@@ -17,10 +17,13 @@ public class GUICloseCancel {
         if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
             if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen) {
                 if (!closepass) {
-                    ci.cancel();
-                    ((ServerPlayerEntity) (Object) this).currentScreenHandler.syncState();
+                    if (timeextension){
+                        ci.cancel();
+                        ((ServerPlayerEntity) (Object) this).currentScreenHandler.syncState();
+                    }
                 } else {
                     closepass = false;
+                    timeextension = false;
                 }
             }
         }
