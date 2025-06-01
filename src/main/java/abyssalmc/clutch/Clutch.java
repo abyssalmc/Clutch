@@ -102,6 +102,7 @@ public class Clutch implements ModInitializer {
 
 	public static double timestart = 0;
 	public static boolean timeextension = false;
+	public static boolean resetclose = false;
 
 	public static int getBlockPosPlayerIsLookingAt(PlayerEntity player, World world, double maxDistance) {
 		if (player != null){
@@ -205,9 +206,10 @@ public class Clutch implements ModInitializer {
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
-					if (context.player().getVelocity().y < 0 && !context.player().isOnGround())
+					if ((context.player().getVelocity().y < 0 && !context.player().isOnGround()) || resetclose)
 					{
 						closepass = true;
+						resetclose = false;
 						context.player().closeHandledScreen();
 					}
 
@@ -350,7 +352,10 @@ public class Clutch implements ModInitializer {
 								}
 								if (automovementcountdown == 2){
 									client.options.backKey.setPressed(false);
-									client.options.jumpKey.setPressed(true);
+									if (client.currentScreen == null){
+
+										client.options.jumpKey.setPressed(true);
+									}
 								}
 								if (automovementcountdown == 1) {
 									client.options.jumpKey.setPressed(false);

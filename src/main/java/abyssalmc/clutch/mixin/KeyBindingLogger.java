@@ -95,6 +95,7 @@ public class KeyBindingLogger {
                 if (client.isIntegratedServerRunning() && client.getServer() != null) {
                     if ((client.currentScreen instanceof HandledScreen<?> || client.currentScreen == null) && !(client.currentScreen instanceof CreativeInventoryScreen)){
                         if (client.currentScreen != null){
+                            resetclose = true;
                             ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
                         }
 
