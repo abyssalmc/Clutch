@@ -54,6 +54,11 @@ public class CursorOffset {
                 offsetEnabled = false;
                 ci.cancel();
             }
+        } else {
+            if (offsetEnabled){
+                offsetEnabled = false;
+                ci.cancel();
+            }
         }
     }
 
