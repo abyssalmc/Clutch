@@ -103,6 +103,10 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("fallparticles").then(CommandManager.literal("disable").executes(ClutchCommand::disablefallparticles))));
 
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("slot").then(CommandManager.argument("slot", IntegerArgumentType.integer()).executes(ClutchCommand::setslot))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("instamine").then(CommandManager.literal("enable").executes(ClutchCommand::enableinstamine))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("instamine").then(CommandManager.literal("disable").executes(ClutchCommand::disableinstamine))));
+
     }
 
 
@@ -722,6 +726,23 @@ public class ClutchCommand {
             p.sendMessage(Text.literal("§cThe slot index must be between 0-8."));
         }
 
+        return 1;
+    }
+
+    private static int enableinstamine(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aTools now instamine."));
+        GlobalDataHandler.setInstamine(true);
+        return 1;
+    }
+    private static int disableinstamine(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aTools no longer instamine."));
+        GlobalDataHandler.setInstamine(false);
         return 1;
     }
 }

@@ -18,6 +18,7 @@ public class GlobalDataHandler {
     private static boolean toggleshift = false;
     private static boolean stalls = false;
     private static boolean falldamageparticles = true;
+    private static boolean instamine = false;
 
     public static void loadGlobalData() {
         try {
@@ -32,6 +33,7 @@ public class GlobalDataHandler {
                 toggleshift = nbt.getBoolean("toggleshift");
                 stalls = nbt.getBoolean("stalls");
                 falldamageparticles = nbt.getBoolean("falldamageparticles");
+                instamine = nbt.getBoolean("instamine");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,6 +54,7 @@ public class GlobalDataHandler {
             nbt.putBoolean("toggleshift", toggleshift);
             nbt.putBoolean("stalls", stalls);
             nbt.putBoolean("falldamageparticles", falldamageparticles);
+            nbt.putBoolean("instamine", instamine);
 
             NbtIo.write(nbt, GLOBAL_DATA_PATH);
         } catch (IOException e) {
@@ -69,6 +72,7 @@ public class GlobalDataHandler {
     public static boolean getToggleShift() { return toggleshift; }
     public static boolean getStalls() { return stalls; }
     public static boolean getFallParticles() { return falldamageparticles; }
+    public static boolean getInstamine() { return instamine; }
 
     public static void setPitch(int gpitch) { pitch = gpitch; }
     public static void setAutomov(boolean b) { automov = b; }
@@ -79,4 +83,5 @@ public class GlobalDataHandler {
     public static void setToggleShift(boolean b) { toggleshift = b; }
     public static void setStalls(boolean b) { stalls = b; }
     public static void setFallParticles(boolean b) { falldamageparticles = b; }
+    public static void setInstamine(boolean b) { instamine = b; }
 }
