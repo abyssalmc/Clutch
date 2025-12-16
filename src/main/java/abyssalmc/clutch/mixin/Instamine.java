@@ -20,7 +20,9 @@ public abstract class Instamine {
         if (GlobalDataHandler.getInstamine()) {
             if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
                 ItemStack held = self.getMainHandStack();
-                if (held.getItem() instanceof MiningToolItem) {
+                float speed = held.getMiningSpeedMultiplier(state);
+
+                if (speed > 1.0f) {
                     cir.setReturnValue(1000000.0f);
                 }
             }
