@@ -704,7 +704,10 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aFall damage particles are now enabled."));
+        if (context.getSource().isExecutedByPlayer()) {
+            p.sendMessage(Text.literal("§aFall damage particles are now enabled."));
+        }
+
         GlobalDataHandler.setFallParticles(true);
         return 1;
     }
@@ -712,7 +715,10 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aFall damage particles are now disabled."));
+        if (context.getSource().isExecutedByPlayer()) {
+            p.sendMessage(Text.literal("§aFall damage particles are now disabled."));
+        }
+
         GlobalDataHandler.setFallParticles(false);
         return 1;
     }
