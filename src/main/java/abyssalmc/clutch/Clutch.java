@@ -259,7 +259,7 @@ public class Clutch implements ModInitializer {
 			PlayerEntity p = mc.player;
 
 			ClientPlayerEntity player = client.player;
-			if (player == null || client.interactionManager == null || client.currentScreen != null) return;
+			if (player == null || client.interactionManager == null) { return; }
 
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
@@ -268,7 +268,9 @@ public class Clutch implements ModInitializer {
 					{
 						closepass = true;
 						resetclose = false;
-						context.player().closeHandledScreen();
+						if (client.currentScreen != null) {
+							context.player().closeHandledScreen();
+						}
 					}
 
 				});
@@ -424,8 +426,6 @@ public class Clutch implements ModInitializer {
 						}
 					}
 				}
-
-
 
 				//INPUT LOC
 				if (client.currentScreen == null){
