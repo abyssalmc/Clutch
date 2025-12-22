@@ -19,6 +19,7 @@ public class GlobalDataHandler {
     private static boolean stalls = false;
     private static boolean falldamageparticles = true;
     private static boolean instamine = false;
+    private static boolean inputbuffering = false;
 
     public static void loadGlobalData() {
         try {
@@ -34,6 +35,7 @@ public class GlobalDataHandler {
                 stalls = nbt.getBoolean("stalls");
                 falldamageparticles = nbt.getBoolean("falldamageparticles");
                 instamine = nbt.getBoolean("instamine");
+                inputbuffering = nbt.getBoolean("inputbuffering");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,6 +57,7 @@ public class GlobalDataHandler {
             nbt.putBoolean("stalls", stalls);
             nbt.putBoolean("falldamageparticles", falldamageparticles);
             nbt.putBoolean("instamine", instamine);
+            nbt.putBoolean("inputbuffering", inputbuffering);
 
             NbtIo.write(nbt, GLOBAL_DATA_PATH);
         } catch (IOException e) {
@@ -73,6 +76,7 @@ public class GlobalDataHandler {
     public static boolean getStalls() { return stalls; }
     public static boolean getFallParticles() { return falldamageparticles; }
     public static boolean getInstamine() { return instamine; }
+    public static boolean getInputBuffering() { return inputbuffering; }
 
     public static void setPitch(int gpitch) { pitch = gpitch; }
     public static void setAutomov(boolean b) { automov = b; }
@@ -84,4 +88,5 @@ public class GlobalDataHandler {
     public static void setStalls(boolean b) { stalls = b; }
     public static void setFallParticles(boolean b) { falldamageparticles = b; }
     public static void setInstamine(boolean b) { instamine = b; }
+    public static void setInputBuffering(boolean b) { inputbuffering = b; }
 }

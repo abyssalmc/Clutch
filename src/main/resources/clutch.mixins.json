@@ -17,7 +17,8 @@
 		"FireworkRNG",
 		"FallDamageParticles",
 		"ModifyMouseCoords",
-		"Instamine"
+		"Instamine",
+		"InputBuffering"
 	],
 	"injectors": {
 		"defaultRequire": 1

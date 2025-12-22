@@ -107,6 +107,11 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("instamine").then(CommandManager.literal("enable").executes(ClutchCommand::enableinstamine))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("instamine").then(CommandManager.literal("disable").executes(ClutchCommand::disableinstamine))));
 
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputbuffering").then(CommandManager.literal("enable").executes(ClutchCommand::enableinputbuffering))));
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputbuffering").then(CommandManager.literal("disable").executes(ClutchCommand::disableinputbuffering))));
+
+        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("commandstates").executes(ClutchCommand::activecommandstates)));
+
     }
 
 
@@ -692,10 +697,15 @@ public class ClutchCommand {
     }
 
     private static int extinguish(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        MinecraftClient client = MinecraftClient.getInstance();
-        PlayerEntity p = client.player;
+        if (context.getSource().isExecutedByPlayer()) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            PlayerEntity p = client.player;
 
-        p.setOnFire(false);
+            if (p != null) {
+                p.setOnFire(false);
+                context.getSource().getPlayer().extinguish();
+            }
+        }
         return 1;
     }
 
@@ -749,6 +759,51 @@ public class ClutchCommand {
 
         p.sendMessage(Text.literal("§aTools no longer instamine."));
         GlobalDataHandler.setInstamine(false);
+        return 1;
+    }
+
+    private static int enableinputbuffering(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aInput buffering is now enabled."));
+        GlobalDataHandler.setInputBuffering(true);
+
+        queueNextClick = false;
+        queueNextClick2 = false;
+        clickedThisTick = false;
+
+        return 1;
+    }
+    private static int disableinputbuffering(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("§aInput buffering is now disabled."));
+        GlobalDataHandler.setInputBuffering(false);
+
+        queueNextClick = false;
+        queueNextClick2 = false;
+        clickedThisTick = false;
+
+        return 1;
+    }
+
+    private static int activecommandstates(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        p.sendMessage(Text.literal("Auto movement: " + GlobalDataHandler.getAutomov() +
+                "\nFall particles: " + GlobalDataHandler.getFallParticles() +
+                "\nInput buffering: " + GlobalDataHandler.getInputBuffering() +
+                "\nInput locator: " + GlobalDataHandler.getInputLocation() +
+                "\nInput sounds: " + GlobalDataHandler.getCustomSounds() +
+                "\nInstamine: " + GlobalDataHandler.getInstamine() +
+                "\nPitch: " + GlobalDataHandler.getPitch() +
+                "\nStalls: " + GlobalDataHandler.getStalls() +
+                "\nToggle shift: " + GlobalDataHandler.getToggleShift()
+        ));
+
         return 1;
     }
 }

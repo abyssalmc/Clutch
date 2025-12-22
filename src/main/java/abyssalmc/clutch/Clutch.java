@@ -21,6 +21,7 @@ import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
@@ -30,6 +31,7 @@ import net.minecraft.network.packet.s2c.play.UpdateSelectedSlotS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
 import net.minecraft.util.hit.BlockHitResult;
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import abyssalmc.clutch.event.keyinputhandler;
 
+import javax.swing.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -180,6 +183,10 @@ public class Clutch implements ModInitializer {
 	public static final Identifier SET_NOT_SNEAKING_PACKET_ID =  Identifier.of(MOD_ID, "set_not_sneaking");
 	public static final Identifier PY_PACKET_ID =  Identifier.of(MOD_ID, "player_y");
 
+	public static boolean clickedThisTick = false;
+	public static boolean queueNextClick = false;
+	public static boolean queueNextClick2 = false;
+
 
 	@Override
 	public void onInitialize() {
@@ -200,9 +207,60 @@ public class Clutch implements ModInitializer {
 		PayloadTypeRegistry.playC2S().register(SetSneakingPayload.ID, SetSneakingPayload.CODEC);
 		PayloadTypeRegistry.playC2S().register(SetNotSneakingPayload.ID, SetNotSneakingPayload.CODEC);
 
+		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+			clickedThisTick = false;
+
+			if (client.player != null && client.currentScreen == null && GlobalDataHandler.getInputBuffering()) {
+				if (queueNextClick2) {
+					queueNextClick2 = false;
+					HitResult crosshairTarget = client.crosshairTarget;
+					Hand hand = Hand.MAIN_HAND;
+
+					if (crosshairTarget != null && crosshairTarget.getType() == HitResult.Type.BLOCK) {
+						BlockHitResult blockHit = (BlockHitResult) crosshairTarget;
+
+						ActionResult placeresult = client.interactionManager.interactBlock(client.player, hand, blockHit);
+
+						if (placeresult != ActionResult.SUCCESS) {
+							ActionResult useresult = client.interactionManager.interactItem(client.player, hand);
+
+							if (useresult != ActionResult.SUCCESS) {
+								Hand hand2 = Hand.OFF_HAND;
+								ActionResult placeresult2 = client.interactionManager.interactBlock(client.player, hand2, blockHit);
+
+								if (placeresult2 != ActionResult.SUCCESS) {
+									client.interactionManager.interactItem(client.player, hand2);
+								}
+
+							}
+						}
+					} else {
+						ActionResult useresult = client.interactionManager.interactItem(client.player, hand);
+
+						if (useresult != ActionResult.SUCCESS) {
+							Hand hand2 = Hand.OFF_HAND;
+							client.interactionManager.interactItem(client.player, hand2);
+						}
+					}
+				}
+
+				if (queueNextClick) {
+					queueNextClick = false;
+					queueNextClick2 = true;
+					clickedThisTick = true;
+				}
+			}
+
+
+		});
+
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			PlayerEntity p = mc.player;
+
+			ClientPlayerEntity player = client.player;
+			if (player == null || client.interactionManager == null || client.currentScreen != null) return;
+
 
 			ServerPlayNetworking.registerGlobalReceiver(CloseGUIPayload.ID, (payload, context) -> {
 				context.server().execute(() -> {
