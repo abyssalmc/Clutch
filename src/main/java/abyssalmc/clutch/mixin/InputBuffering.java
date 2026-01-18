@@ -18,13 +18,16 @@ public abstract class InputBuffering {
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
     private void limitClicks(long window, int button, int action, int mods, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
-        if (client.currentScreen != null || action != GLFW.GLFW_PRESS || button != GLFW.GLFW_MOUSE_BUTTON_RIGHT || !GlobalDataHandler.getInputBuffering()) return;
+        if (client.currentScreen != null || action != GLFW.GLFW_PRESS || !GlobalDataHandler.getInputBuffering()) return;
 
-        if (!clickedThisTick) {
-            clickedThisTick = true;
-        } else {
-            queueNextClick = true;
-            ci.cancel();
+        // Check if it is the use key
+        if (client.options.useKey.matchesMouse(button)) {
+            if (!clickedThisTick) {
+                clickedThisTick = true;
+            } else {
+                queueNextClick = true;
+                ci.cancel();
+            }
         }
     }
 }
