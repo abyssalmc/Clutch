@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
@@ -29,18 +30,18 @@ import static abyssalmc.clutch.event.keyinputhandler.*;
 @Mixin(Keyboard.class)
 public class KeyBindingLogger {
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
-    private void captureKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
+    private void captureKey(long window, int action, KeyInput input, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
 
         // CLICK INDICATOR AND SOUND
         int ishotkey = 0;
         for (KeyBinding hotkey : client.options.hotbarKeys){
-            if (InputUtil.fromTranslationKey(hotkey.getBoundKeyTranslationKey()).getCode() == key){
+            if (hotkey.matchesKey(input)){
                 ishotkey++;
                 break;
             }
         }
-        if (InputUtil.fromTranslationKey(client.options.swapHandsKey.getBoundKeyTranslationKey()).getCode() == key){
+        if (client.options.swapHandsKey.matchesKey(input)){
             ishotkey++;
         }
 
@@ -51,10 +52,10 @@ public class KeyBindingLogger {
                     case 0:
                         break;
                     case 1:
-                        client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 999, 1);
+                        client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 1.0f, 1);
                         break;
                     case 2:
-                        client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 999, 1);
+                        client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 1.0f, 1);
                         break;
                 }
             }
@@ -62,6 +63,7 @@ public class KeyBindingLogger {
             if (action == GLFW.GLFW_PRESS || action == GLFW.GLFW_REPEAT) {
 
                 if (ishotkey != 0){
+
                     if (GlobalDataHandler.getInputLocation() > 0){
                         double xdim = client.getWindow().getScaledWidth(), ydim = client.getWindow().getScaledHeight();
                         double xscale = xdim/client.getWindow().getWidth(), yscale = ydim/client.getWindow().getHeight();
@@ -91,7 +93,7 @@ public class KeyBindingLogger {
 
         // RESET KEY
         if (MinecraftClient.getInstance().player != null){
-            if (key == InputUtil.fromTranslationKey(resetkey.getBoundKeyTranslationKey()).getCode() && action == GLFW.GLFW_PRESS){
+            if (resetkey.matchesKey(input) && action == GLFW.GLFW_PRESS){
                 if (client.isIntegratedServerRunning() && client.getServer() != null) {
                     if ((client.currentScreen instanceof HandledScreen<?> || client.currentScreen == null) && !(client.currentScreen instanceof CreativeInventoryScreen)){
                         if (client.currentScreen != null){

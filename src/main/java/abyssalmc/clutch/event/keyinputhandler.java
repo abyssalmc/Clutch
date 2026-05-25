@@ -1,15 +1,17 @@
 package abyssalmc.clutch.event;
 
+import abyssalmc.clutch.Clutch;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 public class keyinputhandler {
-    public static final String KEY_CATEGORY_CLUTCH = "key.category.clutch.main";
     public static final String KEY_CATEGORY_SHOW = "key.category.clutch.show";
     public static final String KEY_CATEGORY_RESET = "key.category.clutch.reset";
+    public static final KeyBinding.Category CLUTCH_CATEGORY = KeyBinding.Category.create(Identifier.of(Clutch.MOD_ID, "clutch_keys"));
 
     public static KeyBinding togglekey;
     public static KeyBinding resetkey;
@@ -43,18 +45,19 @@ public class keyinputhandler {
     }
 
     public static void register(){
+        // 2. Pass the unique category reference to both keybindings
         togglekey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 KEY_CATEGORY_SHOW,
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_O,
-                KEY_CATEGORY_CLUTCH
+                CLUTCH_CATEGORY
         ));
 
         resetkey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 KEY_CATEGORY_RESET,
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_UNKNOWN,
-                KEY_CATEGORY_CLUTCH
+                CLUTCH_CATEGORY
         ));
         registerKeyInputs();
     }

@@ -169,7 +169,7 @@ public class ClutchCommand {
                 StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
                 serverState.platformcoords = resx + " " + resy + " " + resz + " " + yaw + " ";
 
-                serverState.platformdim = p.getWorld().getRegistryKey().getValue().toString();
+                serverState.platformdim = p.getEntityWorld().getRegistryKey().getValue().toString();
 
                 PacketByteBuf data = PacketByteBufs.create();
                 data.writeString(serverState.platformcoords);
@@ -236,7 +236,7 @@ public class ClutchCommand {
                 StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
                 serverState.platformcoords = resx + " " + resy + " " + resz + " " + yaw + " ";
 
-                serverState.platformdim = p.getWorld().getRegistryKey().getValue().toString();
+                serverState.platformdim = p.getEntityWorld().getRegistryKey().getValue().toString();
 
 
                 PacketByteBuf data = PacketByteBufs.create();

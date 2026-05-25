@@ -49,8 +49,8 @@ public class CursorOffset {
             if (offsetEnabled){
                 this.x = cursorx;
                 this.y = cursory;
-                InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
-                client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
+                InputUtil.setCursorParameters(client.getWindow(), 212993, this.x, this.y);
+                client.execute(() -> InputUtil.setCursorParameters(client.getWindow(), 212993, this.x, this.y));
                 offsetEnabled = false;
                 ci.cancel();
             }
@@ -68,8 +68,8 @@ public class CursorOffset {
             MinecraftClient client = MinecraftClient.getInstance();
             this.x = cursorx;
             this.y = cursory;
-            InputUtil.setCursorParameters(client.getWindow().getHandle(), 212995, this.x, this.y);
-            client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
+            InputUtil.setCursorParameters(client.getWindow(), 212995, this.x, this.y);
+            client.execute(() -> InputUtil.setCursorParameters(client.getWindow(), 212993, this.x, this.y));
         }
     }
 }
