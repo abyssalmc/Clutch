@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.*;
@@ -572,27 +573,27 @@ public class Clutch implements ModInitializer {
 		HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
 			if (showclutch){
 				TextRenderer textRenderer = mc.textRenderer;
-				drawContext.drawTexture(RenderLayer::getGuiTextured, bladder, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
-				drawContext.drawTexture(RenderLayer::getGuiTextured, boat, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
+				drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
+				drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
 
 				int bladdertot = 0;
 				int boattot = 0;
 
-				if (bladderv == 0){drawContext.drawTexture(RenderLayer::getGuiTextured, bladder0, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 1){drawContext.drawTexture(RenderLayer::getGuiTextured, bladder1, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 2){drawContext.drawTexture(RenderLayer::getGuiTextured, bladder2, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 3){drawContext.drawTexture(RenderLayer::getGuiTextured, bladder3, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
-				if (bladderv == 4){drawContext.drawTexture(RenderLayer::getGuiTextured, bladder4, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 0){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder0, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 1){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder1, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 2){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder2, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 3){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder3, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+				if (bladderv == 4){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, bladder4, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
 
-				if (boatv == 0){drawContext.drawTexture(RenderLayer::getGuiTextured, boat0, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 1){drawContext.drawTexture(RenderLayer::getGuiTextured, boat1, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 2){drawContext.drawTexture(RenderLayer::getGuiTextured, boat2, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 3){drawContext.drawTexture(RenderLayer::getGuiTextured, boat3, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
-				if (boatv == 4){drawContext.drawTexture(RenderLayer::getGuiTextured, boat4, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 0){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat0, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 1){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat1, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 2){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat2, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 3){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat3, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+				if (boatv == 4){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, boat4, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
 
 
-				if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(RenderLayer::getGuiTextured, arrow, 10, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
-				if (boatcrouch && boattot>=1){drawContext.drawTexture(RenderLayer::getGuiTextured, arrow, 40, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
+				if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, arrow, 10, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
+				if (boatcrouch && boattot>=1){drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, arrow, 40, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
 			}
 		});
 	}

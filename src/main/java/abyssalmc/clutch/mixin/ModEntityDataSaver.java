@@ -3,6 +3,8 @@ package abyssalmc.clutch.mixin;
 import abyssalmc.clutch.IEntityDataSaver;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,17 +23,16 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
         return persistentData;
     }
 
-    @Inject(at = @At("HEAD"), method = "writeNbt")
-    protected void writeMethod(NbtCompound nbt, CallbackInfoReturnable info) {
+    @Inject(at = @At("HEAD"), method = "writeData")
+    protected void writeMethod(WriteView view, CallbackInfo info) {
         if (persistentData != null){
-            nbt.put("clutch.platform_data", persistentData);
+            view.put("clutch.platform_data", NbtCompound.CODEC, persistentData);
         }
     }
 
-    @Inject(at = @At("HEAD"), method = "readNbt")
-    protected void readMethod(NbtCompound nbt, CallbackInfo info) {
-        if (nbt.contains("clutch.platform_data")){
-            persistentData = nbt.getCompound("clutch.platform_data").orElseGet(NbtCompound::new);
-        }
+    @Inject(at = @At("HEAD"), method = "readData")
+    protected void readMethod(ReadView view, CallbackInfo ci) {
+        persistentData = view.read("clutch.platform_data", NbtCompound.CODEC)
+                .orElseGet(NbtCompound::new);
     }
 }
