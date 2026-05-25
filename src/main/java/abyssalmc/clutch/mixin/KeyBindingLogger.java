@@ -109,35 +109,12 @@ public class KeyBindingLogger {
                         StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
                         if (!serverState.platformcoords.equals("unset")) {
                             client.player.setVelocity(0,0,0);
-                            String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+                            String cmd = "execute in " + serverState.platformdim + " run tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
                             client.getNetworkHandler().sendChatCommand(cmd);
                         }
                         else {
                             client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
                         }
-                    }
-                }
-            }
-        }
-
-        // TOGGLE SHIFT
-
-        if ((!(client.currentScreen instanceof HandledScreen<?>) && key == InputUtil.fromTranslationKey(client.options.sneakKey.getBoundKeyTranslationKey()).getCode())
-                || ((client.currentScreen instanceof HandledScreen<?> && (key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT)))){
-            if (GlobalDataHandler.getToggleShift()){
-                if (action == GLFW.GLFW_PRESS){
-                    if (GlobalDataHandler.getToggleShift()){
-                        if (!client.options.getSneakToggled().getValue()){
-                            toggleshiftstate = !toggleshiftstate;
-                            ci.cancel();
-                        } else {
-                            client.player.sendMessage(Text.literal("§cToggle sneak must be disabled to use this feature. If this is a mistake, run /clutch toggleshift disable."));
-                        }
-
-                    }
-                } else {
-                    if (GlobalDataHandler.getToggleShift() && !client.options.getSneakToggled().getValue()){
-                        ci.cancel();
                     }
                 }
             }

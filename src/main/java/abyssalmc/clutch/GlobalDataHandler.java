@@ -15,7 +15,6 @@ public class GlobalDataHandler {
     private static int inputlocation = 0;
     private static int inputlocator = 0;
     private static int customsounds = 0;
-    private static boolean toggleshift = false;
     private static boolean stalls = false;
     private static boolean falldamageparticles = true;
     private static boolean instamine = false;

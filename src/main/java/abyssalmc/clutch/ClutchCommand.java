@@ -33,6 +33,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Executors;
@@ -168,11 +169,10 @@ public class ClutchCommand {
                 StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
                 serverState.platformcoords = resx + " " + resy + " " + resz + " " + yaw + " ";
 
+                serverState.platformdim = p.getWorld().getRegistryKey().getValue().toString();
 
                 PacketByteBuf data = PacketByteBufs.create();
                 data.writeString(serverState.platformcoords);
-
-
 
                 p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with no offset."));
             }
@@ -235,6 +235,8 @@ public class ClutchCommand {
 
                 StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
                 serverState.platformcoords = resx + " " + resy + " " + resz + " " + yaw + " ";
+
+                serverState.platformdim = p.getWorld().getRegistryKey().getValue().toString();
 
 
                 PacketByteBuf data = PacketByteBufs.create();

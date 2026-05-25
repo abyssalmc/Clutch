@@ -35,21 +35,6 @@ public class hotbar {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        if (GlobalDataHandler.getToggleShift() && p != null){
-            if (!client.options.getSneakToggled().getValue()){
-                if (toggleshiftstate){
-                    if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){
-                        ClientPlayNetworking.send(new SetSneakingPayload(new BlockPos(0,0,0)));
-                    }
-                    client.options.sneakKey.setPressed(true);
-                } else {
-                    if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){
-                        ClientPlayNetworking.send(new SetNotSneakingPayload(new BlockPos(0,0,0)));
-                    }
-                    client.options.sneakKey.setPressed(false);
-                }
-            }
-        }
 
         // TAS INDICATOR
         if (p != null) {
