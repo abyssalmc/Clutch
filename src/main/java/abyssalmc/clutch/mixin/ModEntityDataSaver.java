@@ -30,8 +30,8 @@ public abstract class ModEntityDataSaver implements IEntityDataSaver {
 
     @Inject(at = @At("HEAD"), method = "readNbt")
     protected void readMethod(NbtCompound nbt, CallbackInfo info) {
-        if (nbt.contains("clutch.platform_data",10)){
-            persistentData = nbt.getCompound("clutch.platform_data");
+        if (nbt.contains("clutch.platform_data")){
+            persistentData = nbt.getCompound("clutch.platform_data").orElseGet(NbtCompound::new);
         }
     }
 }

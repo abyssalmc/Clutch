@@ -289,7 +289,7 @@ public class Clutch implements ModInitializer {
 			if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
 				//SLOT CHANGE
 				if (updateslot >= 0){
-					p.getInventory().selectedSlot = updateslot;
+					p.getInventory().setSelectedSlot(updateslot);
 					MinecraftClient.getInstance().getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(updateslot));
 					updateslot = -1;
 				}

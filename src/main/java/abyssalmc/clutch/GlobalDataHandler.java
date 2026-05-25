@@ -9,6 +9,7 @@ import java.nio.file.Path;
 public class GlobalDataHandler {
     private static final String DATA_KEY = "customData";
     private static final Path GLOBAL_DATA_PATH = Path.of("clutch_data/cache/global_data.nbt");
+
     private static int pitch = 77;
     private static boolean automov = false;
     private static int recipe = 0;
@@ -24,16 +25,16 @@ public class GlobalDataHandler {
         try {
             if (Files.exists(GLOBAL_DATA_PATH)) {
                 NbtCompound nbt = NbtIo.read(GLOBAL_DATA_PATH);
-                pitch = nbt.getInt("gpitch");
-                automov = nbt.getBoolean("automov");
-                recipe = nbt.getInt("recipe");
-                inputlocation = nbt.getInt("inputlocation");
-                inputlocator = nbt.getInt("inputlocator");
-                customsounds = nbt.getInt("customsounds");
-                stalls = nbt.getBoolean("stalls");
-                falldamageparticles = nbt.getBoolean("falldamageparticles");
-                instamine = nbt.getBoolean("instamine");
-                inputbuffering = nbt.getBoolean("inputbuffering");
+                pitch = nbt.getInt("gpitch").orElse(77);
+                automov = nbt.getBoolean("automov").orElse(false);
+                recipe = nbt.getInt("recipe").orElse(0);
+                inputlocation = nbt.getInt("inputlocation").orElse(0);
+                inputlocator = nbt.getInt("inputlocator").orElse(0);
+                customsounds = nbt.getInt("customsounds").orElse(0);
+                stalls = nbt.getBoolean("stalls").orElse(false);
+                falldamageparticles = nbt.getBoolean("falldamageparticles").orElse(true);
+                instamine = nbt.getBoolean("instamine").orElse(false);
+                inputbuffering = nbt.getBoolean("inputbuffering").orElse(false);
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -32,7 +32,6 @@ public class hotbar {
         Identifier indicator = Identifier.of(Clutch.MOD_ID, "textures/indicator.png");
         Identifier itas = Identifier.of(Clutch.MOD_ID, "textures/itas.png");
 
-        RenderSystem.enableBlend();
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
@@ -40,10 +39,9 @@ public class hotbar {
         // TAS INDICATOR
         if (p != null) {
             if (Clutch.isTas) {
-                context.drawTexture(RenderLayer::getGuiTextured, itas, context.getScaledWindowWidth() / 2 - 72 - 1 + p.getInventory().selectedSlot * 20, context.getScaledWindowHeight() - 2 - 1, 0, 0, 1, 1, 1, 1);
+                context.drawTexture(RenderLayer::getGuiTextured, itas, context.getScaledWindowWidth() / 2 - 72 - 1 + p.getInventory().getSelectedSlot() * 20, context.getScaledWindowHeight() - 2 - 1, 0, 0, 1, 1, 1, 1);
                 context.drawTexture(RenderLayer::getGuiTextured, indicator, context.getScaledWindowWidth() / 2 - 13, context.getScaledWindowHeight() - 4, 0, 0, 1, 1, 1, 1);
             }
         }
-        RenderSystem.disableBlend();
     }
 }
