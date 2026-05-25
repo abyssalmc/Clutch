@@ -113,7 +113,7 @@ public class KeyBindingLogger {
                             client.getNetworkHandler().sendChatCommand(cmd);
                         }
                         else {
-                            client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."));
+                            client.player.sendMessage(Text.literal("§cA platform must be set to use this! run /platform to get started."), false);
                         }
                     }
                 }

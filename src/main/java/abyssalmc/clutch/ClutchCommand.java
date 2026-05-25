@@ -153,11 +153,11 @@ public class ClutchCommand {
             if (mc.world.getBlockState(base.east()).createScreenHandlerFactory(mc.world, base.east()) != null){yaw = 90;tables++;}
 
             if (tables == 0){
-                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"), false);
                 configured = false;
             }
             if (tables >= 2){
-                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"), false);
                 configured = false;
             }
             if (tables == 1){
@@ -174,12 +174,12 @@ public class ClutchCommand {
                 PacketByteBuf data = PacketByteBufs.create();
                 data.writeString(serverState.platformcoords);
 
-                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with no offset."));
+                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with no offset."), false);
             }
 
         }
         else{
-            p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"));
+            p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"), false);
             configured = false;
         }
 
@@ -220,11 +220,11 @@ public class ClutchCommand {
             if (mc.world.getBlockState(base.east()).createScreenHandlerFactory(mc.world, base.east()) != null){yaw = 90;tables++;xshift=offset;}
 
             if (tables == 0){
-                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere must be a block entity adjacent to the standing block!"), false);
                 configured = false;
             }
             if (tables >= 2){
-                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"));
+                p.sendMessage(Text.literal("§cThere can only be one block entity adjacent to the standing block!"), false);
                 configured = false;
             }
             if (tables == 1){
@@ -242,11 +242,11 @@ public class ClutchCommand {
                 PacketByteBuf data = PacketByteBufs.create();
                 data.writeString(serverState.platformcoords);
 
-                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with an offset of " + offset + " blocks."));
+                p.sendMessage(Text.literal("§aPlatform set at " + serverState.platformcoords + "with an offset of " + offset + " blocks."), false);
             }
         }
         else{
-            p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"));
+            p.sendMessage(Text.literal("§cYou must be on top of a pressure plate to set a platform!"), false);
             configured = false;
         }
 
@@ -257,7 +257,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(context.getSource().getServer());
-        p.sendMessage(Text.literal(serverState.platformcoords));
+        p.sendMessage(Text.literal(serverState.platformcoords), false);
         return 1;
     }
 
@@ -267,7 +267,7 @@ public class ClutchCommand {
 
         GlobalDataHandler.setAutomov(true);
 
-        p.sendMessage(Text.literal("§aAutomatic reset movement enabled."));
+        p.sendMessage(Text.literal("§aAutomatic reset movement enabled."), false);
         return 1;
     }
     private static int ad(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -276,7 +276,7 @@ public class ClutchCommand {
 
         GlobalDataHandler.setAutomov(false);
 
-        p.sendMessage(Text.literal("§aAutomatic reset movement disabled."));
+        p.sendMessage(Text.literal("§aAutomatic reset movement disabled."), false);
         return 1;
     }
 
@@ -289,7 +289,7 @@ public class ClutchCommand {
         cursory = IntegerArgumentType.getInteger(context, "cursorY");
 
         if (context.getSource().isExecutedByPlayer() && context.getSource().getEntity() instanceof ServerPlayerEntity){
-            p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."));
+            p.sendMessage(Text.literal("§aThe cursor will now open at (" + cursorx + "," + cursory + ")."), false);
         }
 
 
@@ -302,7 +302,7 @@ public class ClutchCommand {
 
         offsetEnabled = false;
         if (context.getSource().isExecutedByPlayer()){
-            p.sendMessage(Text.literal("§aThe cursor will no longer offset."));
+            p.sendMessage(Text.literal("§aThe cursor will no longer offset."), false);
         }
         return 1;
     }
@@ -311,7 +311,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setPitch(IntegerArgumentType.getInteger(context, "angle"));
-        p.sendMessage(Text.literal("Reset pitch updated to §a" + IntegerArgumentType.getInteger(context, "angle") + "§r."));
+        p.sendMessage(Text.literal("Reset pitch updated to §a" + IntegerArgumentType.getInteger(context, "angle") + "§r."), false);
 
         return 1;
     }
@@ -320,7 +320,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setRecipe(0);
-        p.sendMessage(Text.literal("§aRecipe book mode set to default."));
+        p.sendMessage(Text.literal("§aRecipe book mode set to default."), false);
 
         return 1;
     }
@@ -329,7 +329,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setRecipe(1);
-        p.sendMessage(Text.literal("§aRecipe book mode set to disabled."));
+        p.sendMessage(Text.literal("§aRecipe book mode set to disabled."), false);
 
         return 1;
     }
@@ -338,7 +338,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setRecipe(2);
-        p.sendMessage(Text.literal("§aRecipe book mode set to occluded."));
+        p.sendMessage(Text.literal("§aRecipe book mode set to occluded."), false);
 
         return 1;
     }
@@ -347,7 +347,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocation(0);
-        p.sendMessage(Text.literal("§aInput location utils will not be displayed."));
+        p.sendMessage(Text.literal("§aInput location utils will not be displayed."), false);
 
         return 1;
     }
@@ -356,7 +356,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocation(1);
-        p.sendMessage(Text.literal("§aInput location utils will be displayed on misses."));
+        p.sendMessage(Text.literal("§aInput location utils will be displayed on misses."), false);
 
         return 1;
     }
@@ -365,7 +365,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocation(2);
-        p.sendMessage(Text.literal("§aInput location utils will always be displayed."));
+        p.sendMessage(Text.literal("§aInput location utils will always be displayed."), false);
 
         return 1;
     }
@@ -375,7 +375,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocator(0);
-        p.sendMessage(Text.literal("§aInput locator style set to dot."));
+        p.sendMessage(Text.literal("§aInput locator style set to dot."), false);
 
         return 1;
     }
@@ -384,7 +384,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocator(1);
-        p.sendMessage(Text.literal("§aInput locator style set to diamond."));
+        p.sendMessage(Text.literal("§aInput locator style set to diamond."), false);
 
         return 1;
     }
@@ -393,7 +393,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setInputlocator(2);
-        p.sendMessage(Text.literal("§aInput locator style set to plus."));
+        p.sendMessage(Text.literal("§aInput locator style set to plus."), false);
 
         return 1;
     }
@@ -404,7 +404,7 @@ public class ClutchCommand {
 
         guitime = IntegerArgumentType.getInteger(context, "ticks");
         tempguitime = guitime;
-        p.sendMessage(Text.literal("§aGUI time set to " + guitime + " ticks."));
+        p.sendMessage(Text.literal("§aGUI time set to " + guitime + " ticks."), false);
 
 
         return 1;
@@ -414,7 +414,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         guitime = 0;
-        p.sendMessage(Text.literal("§aGUI time set to normal, closing the table after moving 8 blocks away."));
+        p.sendMessage(Text.literal("§aGUI time set to normal, closing the table after moving 8 blocks away."), false);
 
 
         return 1;
@@ -424,7 +424,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setCustomSounds(0);
-        p.sendMessage(Text.literal("§aGUI input sounds disabled."));
+        p.sendMessage(Text.literal("§aGUI input sounds disabled."), false);
 
         return 1;
     }
@@ -433,7 +433,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setCustomSounds(1);
-        p.sendMessage(Text.literal("§aGUI input sound set to osu."));
+        p.sendMessage(Text.literal("§aGUI input sound set to osu."), false);
 
         return 1;
     }
@@ -442,7 +442,7 @@ public class ClutchCommand {
         PlayerEntity p = context.getSource().getPlayer();
 
         GlobalDataHandler.setCustomSounds(2);
-        p.sendMessage(Text.literal("§aGUI input sound set to bass kick."));
+        p.sendMessage(Text.literal("§aGUI input sound set to bass kick."), false);
 
         return 1;
     }
@@ -471,9 +471,9 @@ public class ClutchCommand {
                 }
             }
             if (attemptcount != -1) {
-                p.sendMessage(Text.literal("§aThere have been " + (attemptcount-1) + " attempts on this platform."));
+                p.sendMessage(Text.literal("§aThere have been " + (attemptcount-1) + " attempts on this platform."), false);
             } else {
-                p.sendMessage(Text.literal("§cThere are no recorded attempts here. Make sure you are standing on the platform pressure plate!"));
+                p.sendMessage(Text.literal("§cThere are no recorded attempts here. Make sure you are standing on the platform pressure plate!"), false);
             }
         }
 
@@ -501,9 +501,9 @@ public class ClutchCommand {
             }
         }
         if (removalcount == 0) {
-            p.sendMessage(Text.literal("§cCould not remove attempts as none are recorded. Make sure to stand on the platform pressure plate!"));
+            p.sendMessage(Text.literal("§cCould not remove attempts as none are recorded. Make sure to stand on the platform pressure plate!"), false);
         } else {
-            p.sendMessage(Text.literal("§aPlatform attempts reset to 0."));
+            p.sendMessage(Text.literal("§aPlatform attempts reset to 0."), false);
         }
         serverState.platformattempts = newattemptstring;
         return 1;
@@ -518,7 +518,7 @@ public class ClutchCommand {
         String pta = serverState.platformattempts;
 
         serverState.platformattempts = "";
-        p.sendMessage(Text.literal("§aAll persistent platform attempts have been cleared."));
+        p.sendMessage(Text.literal("§aAll persistent platform attempts have been cleared."), false);
 
         return 1;
     }
@@ -555,10 +555,10 @@ public class ClutchCommand {
 
         if (client.isIntegratedServerRunning() && client.getServer() != null) {
             StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-            p.sendMessage(Text.literal("§aProjectiles will now have rng on this world."));
+            p.sendMessage(Text.literal("§aProjectiles will now have rng on this world."), false);
             serverState.projectilerng = true;
         } else {
-            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."), false);
         }
         return 1;
     }
@@ -568,10 +568,10 @@ public class ClutchCommand {
 
         if (client.isIntegratedServerRunning() && client.getServer() != null) {
             StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
-            p.sendMessage(Text.literal("§aProjectiles will no longer have rng on this world."));
+            p.sendMessage(Text.literal("§aProjectiles will no longer have rng on this world."), false);
             serverState.projectilerng = false;
         } else {
-            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."), false);
         }
         return 1;
     }
@@ -664,10 +664,10 @@ public class ClutchCommand {
         PlayerEntity p = client.player;
 
         if (client.isIntegratedServerRunning() && client.getServer() != null) {
-            p.sendMessage(Text.literal("§aStalls are now enabled."));
+            p.sendMessage(Text.literal("§aStalls are now enabled."), false);
             GlobalDataHandler.setStalls(true);
         } else {
-            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."), false);
         }
         return 1;
     }
@@ -676,10 +676,10 @@ public class ClutchCommand {
         PlayerEntity p = client.player;
 
         if (client.isIntegratedServerRunning() && client.getServer() != null) {
-            p.sendMessage(Text.literal("§aStalls are now disabled."));
+            p.sendMessage(Text.literal("§aStalls are now disabled."), false);
             GlobalDataHandler.setStalls(false);
         } else {
-            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."));
+            p.sendMessage(Text.literal("§cThis command can only be used in singleplayer."), false);
         }
         return 1;
     }
@@ -703,7 +703,7 @@ public class ClutchCommand {
         PlayerEntity p = client.player;
 
         if (context.getSource().isExecutedByPlayer()) {
-            p.sendMessage(Text.literal("§aFall damage particles are now enabled."));
+            p.sendMessage(Text.literal("§aFall damage particles are now enabled."), false);
         }
 
         GlobalDataHandler.setFallParticles(true);
@@ -714,7 +714,7 @@ public class ClutchCommand {
         PlayerEntity p = client.player;
 
         if (context.getSource().isExecutedByPlayer()) {
-            p.sendMessage(Text.literal("§aFall damage particles are now disabled."));
+            p.sendMessage(Text.literal("§aFall damage particles are now disabled."), false);
         }
 
         GlobalDataHandler.setFallParticles(false);
@@ -727,7 +727,7 @@ public class ClutchCommand {
         if (0 <= slot && slot <= 8){
             updateslot = slot;
         } else {
-            p.sendMessage(Text.literal("§cThe slot index must be between 0-8."));
+            p.sendMessage(Text.literal("§cThe slot index must be between 0-8."), false);
         }
 
         return 1;
@@ -737,7 +737,7 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aTools now instamine."));
+        p.sendMessage(Text.literal("§aTools now instamine."), false);
         GlobalDataHandler.setInstamine(true);
         return 1;
     }
@@ -745,7 +745,7 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aTools no longer instamine."));
+        p.sendMessage(Text.literal("§aTools no longer instamine."), false);
         GlobalDataHandler.setInstamine(false);
         return 1;
     }
@@ -754,7 +754,7 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aInput buffering is now enabled."));
+        p.sendMessage(Text.literal("§aInput buffering is now enabled."), false);
         GlobalDataHandler.setInputBuffering(true);
 
         queueNextClick = false;
@@ -767,7 +767,7 @@ public class ClutchCommand {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
 
-        p.sendMessage(Text.literal("§aInput buffering is now disabled."));
+        p.sendMessage(Text.literal("§aInput buffering is now disabled."), false);
         GlobalDataHandler.setInputBuffering(false);
 
         queueNextClick = false;
@@ -789,7 +789,7 @@ public class ClutchCommand {
                 "\nInstamine: " + GlobalDataHandler.getInstamine() +
                 "\nPitch: " + GlobalDataHandler.getPitch() +
                 "\nStalls: " + GlobalDataHandler.getStalls()
-        ));
+        ), false);
 
         return 1;
     }
