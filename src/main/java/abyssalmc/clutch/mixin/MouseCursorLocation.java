@@ -79,10 +79,10 @@ public abstract class MouseCursorLocation {
             case 0:
                 break;
             case 1:
-                client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 999, 1);
+                client.player.playSound(ModSounds.OSU, 999, 1);
                 break;
             case 2:
-                client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 999, 1);
+                client.player.playSound(ModSounds.BASSKICK, 999, 1);
                 break;
         }
 

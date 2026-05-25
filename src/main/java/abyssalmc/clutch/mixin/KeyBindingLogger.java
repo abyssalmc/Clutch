@@ -52,10 +52,10 @@ public class KeyBindingLogger {
                     case 0:
                         break;
                     case 1:
-                        client.player.playSoundToPlayer(ModSounds.OSU, SoundCategory.MASTER, 1.0f, 1);
+                        client.player.playSound(ModSounds.OSU, 1.0f, 1);
                         break;
                     case 2:
-                        client.player.playSoundToPlayer(ModSounds.BASSKICK, SoundCategory.MASTER, 1.0f, 1);
+                        client.player.playSound(ModSounds.BASSKICK, 1.0f, 1);
                         break;
                 }
             }
