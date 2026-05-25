@@ -31,7 +31,6 @@ public class GlobalDataHandler {
                 inputlocation = nbt.getInt("inputlocation");
                 inputlocator = nbt.getInt("inputlocator");
                 customsounds = nbt.getInt("customsounds");
-                toggleshift = nbt.getBoolean("toggleshift");
                 stalls = nbt.getBoolean("stalls");
                 falldamageparticles = nbt.getBoolean("falldamageparticles");
                 instamine = nbt.getBoolean("instamine");
@@ -53,7 +52,6 @@ public class GlobalDataHandler {
             nbt.putInt("inputlocation", inputlocation);
             nbt.putInt("inputlocator", inputlocator);
             nbt.putInt("customsounds", customsounds);
-            nbt.putBoolean("toggleshift", toggleshift);
             nbt.putBoolean("stalls", stalls);
             nbt.putBoolean("falldamageparticles", falldamageparticles);
             nbt.putBoolean("instamine", instamine);
@@ -72,7 +70,6 @@ public class GlobalDataHandler {
     public static int getInputLocation() { return inputlocation; }
     public static int getInputLocator() { return inputlocator; }
     public static int getCustomSounds() { return customsounds; }
-    public static boolean getToggleShift() { return toggleshift; }
     public static boolean getStalls() { return stalls; }
     public static boolean getFallParticles() { return falldamageparticles; }
     public static boolean getInstamine() { return instamine; }
@@ -84,7 +81,6 @@ public class GlobalDataHandler {
     public static void setInputlocation(int ipl) { inputlocation = ipl; }
     public static void setInputlocator(int ipl) { inputlocator = ipl; }
     public static void setCustomSounds(int sound) { customsounds = sound; }
-    public static void setToggleShift(boolean b) { toggleshift = b; }
     public static void setStalls(boolean b) { stalls = b; }
     public static void setFallParticles(boolean b) { falldamageparticles = b; }
     public static void setInstamine(boolean b) { instamine = b; }

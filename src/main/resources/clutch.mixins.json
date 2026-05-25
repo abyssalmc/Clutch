@@ -12,7 +12,6 @@
 		"GUICloseCancel",
 		"GUIOpenListener",
 		"PreventCraftingGuiCloseScreenHandlerMixin",
-		"ToggleShift",
 		"ProjectileRNG",
 		"FireworkRNG",
 		"FallDamageParticles",

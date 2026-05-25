@@ -86,9 +86,6 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("hunger").then(CommandManager.argument("hunger", IntegerArgumentType.integer()).executes(ClutchCommand::sethunger))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("saturation").then(CommandManager.argument("saturation", FloatArgumentType.floatArg()).executes(ClutchCommand::setsat))));
 
-        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("enable").executes(ClutchCommand::enabletoggleshift))));
-        dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("toggleshift").then(CommandManager.literal("disable").executes(ClutchCommand::disabletoggleshift))));
-
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("enable").executes(ClutchCommand::enableprojectilerng))));
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("projectilerng").then(CommandManager.literal("disable").executes(ClutchCommand::disableprojectilerng))));
 
@@ -111,6 +108,14 @@ public class ClutchCommand {
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("inputbuffering").then(CommandManager.literal("disable").executes(ClutchCommand::disableinputbuffering))));
 
         dispatcher.register(CommandManager.literal("clutch").then(CommandManager.literal("commandstates").executes(ClutchCommand::activecommandstates)));
+
+        dispatcher.register(CommandManager.literal("clutch")
+                .then(CommandManager.literal("velocity")
+                .then(CommandManager.argument("x", DoubleArgumentType.doubleArg())
+                .then(CommandManager.argument("y", DoubleArgumentType.doubleArg())
+                .then(CommandManager.argument("z", DoubleArgumentType.doubleArg())
+                .executes(ClutchCommand::velocity))))));
+
 
     }
 
@@ -542,25 +547,6 @@ public class ClutchCommand {
         return 1;
     }
 
-    private static int enabletoggleshift(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        PlayerEntity p = mc.player;
-
-        GlobalDataHandler.setToggleShift(true);
-
-        p.sendMessage(Text.literal("§aToggle shift enabled (works in guis too). This only works if other toggle sneaks are disabled, including the vanilla one. There may also be issues using this on servers."));
-        return 1;
-    }
-    private static int disabletoggleshift(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        PlayerEntity p = mc.player;
-
-        GlobalDataHandler.setToggleShift(false);
-
-        p.sendMessage(Text.literal("§aToggle shift disabled."));
-        return 1;
-    }
-
     private static int enableprojectilerng(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity p = client.player;
@@ -800,10 +786,24 @@ public class ClutchCommand {
                 "\nInput sounds: " + GlobalDataHandler.getCustomSounds() +
                 "\nInstamine: " + GlobalDataHandler.getInstamine() +
                 "\nPitch: " + GlobalDataHandler.getPitch() +
-                "\nStalls: " + GlobalDataHandler.getStalls() +
-                "\nToggle shift: " + GlobalDataHandler.getToggleShift()
+                "\nStalls: " + GlobalDataHandler.getStalls()
         ));
 
         return 1;
     }
+
+
+    private static int velocity(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity p = client.player;
+
+        double x = DoubleArgumentType.getDouble(context, "x");
+        double y = DoubleArgumentType.getDouble(context, "y");
+        double z = DoubleArgumentType.getDouble(context, "z");
+
+        p.setVelocity(x,y,z);
+
+        return 1;
+    }
+
 }
