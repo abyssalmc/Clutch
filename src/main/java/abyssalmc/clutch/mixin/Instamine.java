@@ -20,9 +20,13 @@ public abstract class Instamine {
         if (GlobalDataHandler.getInstamine()) {
             if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
                 ItemStack held = self.getMainHandStack();
-                float speed = held.getMiningSpeedMultiplier(state);
 
-                if (speed > 1.0f) {
+                float speed = held.getMiningSpeedMultiplier(state);
+                float hardness = state.getHardness(self.getWorld(), null);
+                System.out.println(hardness);
+
+                // instamine condition (ignoring falling)
+                if (speed >= hardness * 30.0f) {
                     cir.setReturnValue(1000000.0f);
                 }
             }
