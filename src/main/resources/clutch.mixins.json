@@ -18,6 +18,7 @@
 		"ModifyMouseCoords",
 		"Instamine",
 		"InputBuffering"
+
 	],
 	"injectors": {
 		"defaultRequire": 1
