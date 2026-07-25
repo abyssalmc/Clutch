@@ -36,13 +36,15 @@ public class hotbar {
         PlayerEntity p = client.player;
 
 
-        // TAS INDICATOR
+        // TPS INDICATOR
+        /*
         if (p != null) {
-            if (Clutch.isTas) {
-                context.drawTexture(itas, context.getScaledWindowWidth() / 2 - 72 - 1 + p.getInventory().selectedSlot * 20, context.getScaledWindowHeight() - 2 - 1, 0, 0, 1, 1, 1, 1);
-                context.drawTexture(indicator, context.getScaledWindowWidth() / 2 - 13, context.getScaledWindowHeight() - 4, 0, 0, 1, 1, 1, 1);
+            if (Clutch.isTPS) {
+                int slotx = context.getScaledWindowWidth() / 2 - 90 + p.getInventory().selectedSlot * 20;
+                int sloty = context.getScaledWindowHeight() - 2;
+                context.fill(slotx, sloty, slotx+1, sloty+1, 0xFFb7c7b3);
             }
-        }
+        }*/
         RenderSystem.disableBlend();
     }
 }

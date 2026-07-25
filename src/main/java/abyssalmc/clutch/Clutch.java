@@ -81,7 +81,7 @@ public class Clutch implements ModInitializer {
 	private double lastTickTime = 0;
 	public static List<Double> tickavg = new ArrayList<>(){};
 
-	public static boolean isTas = false;
+	public static boolean isTPS = false;
 
 	public static List<Integer> cxcoords = new ArrayList<>();
 	public static List<Integer> cycoords = new ArrayList<>();
@@ -385,9 +385,9 @@ public class Clutch implements ModInitializer {
 						}
 						tickavg.add(tickDuration);
 						if (calculateAverage(tickavg) >= 54 && thresholdTest(tickavg) > 4){
-							isTas = true;
+							isTPS = true;
 						} else {
-							isTas = false;
+							isTPS = false;
 						}
 					}
 				}

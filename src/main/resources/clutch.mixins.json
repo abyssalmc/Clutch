@@ -17,7 +17,8 @@
 		"FallDamageParticles",
 		"ModifyMouseCoords",
 		"Instamine",
-		"InputBuffering"
+		"InputBuffering",
+		"CraftingScreenOverride"
 
 	],
 	"injectors": {
