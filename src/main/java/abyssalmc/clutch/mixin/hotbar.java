@@ -24,7 +24,7 @@ public class hotbar {
         PlayerEntity p = client.player;
 
         if (p != null) {
-            if (Clutch.isTas) {
+            if (Clutch.isTPS) {
                 int slotx = context.getScaledWindowWidth() / 2 - 90 + p.getInventory().getSelectedSlot() * 20;
                 int sloty = context.getScaledWindowHeight() - 2;
                 context.fill(slotx, sloty, slotx+1, sloty+1, 0xFFafc0ab);
