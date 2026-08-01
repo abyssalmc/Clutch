@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 
-import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.ClutchClient.*;
 import static java.lang.Math.floor;
 
 @Mixin(MinecraftClient.class)
@@ -35,10 +35,6 @@ public class GUIOpenListener {
                 timeextension = false;
 
             }
-
-            //MinecraftClient.getInstance().mouse.lockCursor();
-            //InputUtil.setCursorParameters(MinecraftClient.getInstance().getWindow().getHandle(), 212993, cursorx, cursory);
-            //MinecraftClient.getInstance().mouse.unlockCursor();
         }
     }
 }

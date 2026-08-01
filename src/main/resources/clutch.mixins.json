@@ -19,7 +19,6 @@
 		"Instamine",
 		"InputBuffering",
 		"CraftingScreenOverride"
-
 	],
 	"injectors": {
 		"defaultRequire": 1

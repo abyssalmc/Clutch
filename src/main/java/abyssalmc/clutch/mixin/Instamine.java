@@ -23,26 +23,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class Instamine {
     @Inject(method = "getBlockBreakingSpeed", at = @At("RETURN"), cancellable = true)
     private void Instamine(BlockState state, CallbackInfoReturnable<Float> cir) {
+        // singleplayer check
+        if (!MinecraftClient.getInstance().isIntegratedServerRunning() || MinecraftClient.getInstance().getServer() == null) return;
+
         PlayerEntity self = (PlayerEntity)(Object)this;
 
         if (GlobalDataHandler.getInstamine()) {
-            if (MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
-                ItemStack held = self.getMainHandStack();
+            ItemStack held = self.getMainHandStack();
 
-                float speed = held.getMiningSpeedMultiplier(state); // > 1 if right tool type
+            float speed = held.getMiningSpeedMultiplier(state); // > 1 if right tool type
 
-                if (speed > 1f) {
-                    if (state.isOf(Blocks.DAYLIGHT_DETECTOR)
-                            || state.isOf(Blocks.MOSS_BLOCK)
-                            || state.isOf(Blocks.SNOW_BLOCK)
-                            || state.isOf(Blocks.SCULK)
-                            || state.isIn(BlockTags.LEAVES)
-                            || state.isOf(Blocks.BROWN_MUSHROOM_BLOCK)
-                            || state.isOf(Blocks.RED_MUSHROOM_BLOCK)
-                            || state.isOf(Blocks.MUSHROOM_STEM)) {
+            if (speed > 1f) {
+                if (state.isOf(Blocks.DAYLIGHT_DETECTOR)
+                        || state.isOf(Blocks.MOSS_BLOCK)
+                        || state.isOf(Blocks.SNOW_BLOCK)
+                        || state.isOf(Blocks.SCULK)
+                        || state.isIn(BlockTags.LEAVES)
+                        || state.isOf(Blocks.BROWN_MUSHROOM_BLOCK)
+                        || state.isOf(Blocks.RED_MUSHROOM_BLOCK)
+                        || state.isOf(Blocks.MUSHROOM_STEM)) {
 
-                        cir.setReturnValue(1000000f);
-                    }
+                    cir.setReturnValue(1000000f);
                 }
             }
         }

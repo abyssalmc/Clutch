@@ -1,6 +1,7 @@
 package abyssalmc.clutch.mixin;
 
 import abyssalmc.clutch.Clutch;
+import abyssalmc.clutch.ClutchClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.CraftingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -25,7 +26,7 @@ public abstract class CraftingScreenOverride extends HandledScreen<CraftingScree
 
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
     private void drawCustomBackground(DrawContext context, float delta, int mouseX, int mouseY, CallbackInfo ci) {
-        if (Clutch.isTPS) {
+        if (ClutchClient.isTPS) {
             context.drawTexture(SECRET_TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 
             ci.cancel();

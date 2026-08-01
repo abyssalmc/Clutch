@@ -39,8 +39,8 @@ import org.lwjgl.glfw.GLFW;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.ClutchClient.*;
 
 public class ClutchCommand {
 

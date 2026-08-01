@@ -8,13 +8,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.ClutchClient.*;
 
 @Mixin(ServerPlayerEntity.class)
 public class GUICloseCancel {
     @Inject(method = "closeHandledScreen", at = @At("HEAD"), cancellable = true)
     private void cancelClose(CallbackInfo ci) {
-        if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+        // singleplayer check
+        if (!MinecraftClient.getInstance().isIntegratedServerRunning() || MinecraftClient.getInstance().getServer() == null) return;
+
+        if (guitime != 0) {
             if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen) {
                 if (!closepass) {
                     if (timeextension){

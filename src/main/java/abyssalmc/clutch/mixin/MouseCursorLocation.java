@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Set;
 
-import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.ClutchClient.*;
 
 @Mixin(HandledScreen.class)
 public abstract class MouseCursorLocation {

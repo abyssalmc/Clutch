@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static abyssalmc.clutch.Clutch.clickedThisTick;
-import static abyssalmc.clutch.Clutch.queueNextClick;
+import static abyssalmc.clutch.ClutchClient.clickedThisTick;
+import static abyssalmc.clutch.ClutchClient.queueNextClick;
 
 @Mixin(Mouse.class)
 public abstract class InputBuffering {
@@ -20,7 +20,7 @@ public abstract class InputBuffering {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.currentScreen != null || action != GLFW.GLFW_PRESS || !GlobalDataHandler.getInputBuffering()) return;
 
-        // Check if it is the use key
+        // check if it is the use key
         if (client.options.useKey.matchesMouse(button)) {
             if (!clickedThisTick) {
                 clickedThisTick = true;

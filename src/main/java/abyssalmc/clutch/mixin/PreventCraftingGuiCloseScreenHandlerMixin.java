@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static abyssalmc.clutch.Clutch.guitime;
-import static abyssalmc.clutch.Clutch.timeextension;
+import static abyssalmc.clutch.ClutchClient.guitime;
+import static abyssalmc.clutch.ClutchClient.timeextension;
 
 @Mixin(CraftingScreenHandler.class)
 public abstract class PreventCraftingGuiCloseScreenHandlerMixin extends ScreenHandler {
@@ -22,7 +22,10 @@ public abstract class PreventCraftingGuiCloseScreenHandlerMixin extends ScreenHa
     }
     @Inject(method = "canUse", at = @At("HEAD"), cancellable = true)
     private void alwaysAllowUse(PlayerEntity player, CallbackInfoReturnable<Boolean> cir) {
-        if (guitime != 0 && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null){
+        // singleplayer check
+        if (!MinecraftClient.getInstance().isIntegratedServerRunning() || MinecraftClient.getInstance().getServer() == null) return;
+
+        if (guitime != 0){
             if (timeextension){
                 cir.setReturnValue(true);
             }

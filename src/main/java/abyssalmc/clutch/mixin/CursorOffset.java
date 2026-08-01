@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static abyssalmc.clutch.Clutch.*;
+import static abyssalmc.clutch.ClutchClient.*;
 
 @Mixin(Mouse.class)
 public class CursorOffset {
@@ -26,21 +26,6 @@ public class CursorOffset {
 
     @Shadow
     private double y;
-
-    @Shadow
-    private boolean cursorLocked;
-
-    private boolean locked = false;
-
-
-    @Inject(method = "unlockCursor", at = @At("HEAD"), cancellable = true)
-    private void checkLocked(CallbackInfo ci) {
-        locked = this.cursorLocked;
-    }
-    @Inject(method = "lockCursor", at = @At("HEAD"), cancellable = true)
-    private void checkLocked2(CallbackInfo ci) {
-        locked = this.cursorLocked;
-    }
 
     @Inject(method = "unlockCursor", at = @At("TAIL"), cancellable = true)
     private void unlockPos(CallbackInfo ci) {

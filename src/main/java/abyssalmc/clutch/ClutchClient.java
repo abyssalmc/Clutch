@@ -1,10 +1,482 @@
 package abyssalmc.clutch;
 
+import abyssalmc.clutch.event.keyinputhandler;
+import abyssalmc.clutch.setupblock.CustomStorageScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import org.lwjgl.glfw.GLFW;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import static abyssalmc.clutch.event.keyinputhandler.*;
 
 public class ClutchClient implements ClientModInitializer {
+
+    int clock = 0;
+
+    public static double resx = 0;
+    public static int resy = 0;
+    public static double resz = 0;
+
+    public static double cursorx = 960;
+    public static double cursory = 540;
+
+    public static boolean offsetEnabled = false;
+
+    public static boolean bladdercrouch = false;
+    public static boolean boatcrouch = false;
+
+    public static int automovementcountdown = 0;
+
+    private double lastTickTime = 0;
+    public static List<Double> tickavg = new ArrayList<>(){};
+
+    public static boolean isTPS = false;
+
+    public static List<Integer> cxcoords = new ArrayList<>();
+    public static List<Integer> cycoords = new ArrayList<>();
+
+    public static int updateslot = -1;
+
+    public static int guix = 0;
+    public static int guiy = 0;
+    public static int guitime = 0;
+    public static int tempguitime = 0;
+
+    public static boolean overplate = false;
+    public static boolean lastoverplate = false;
+
+    public static boolean closepass = false;
+
+    public static boolean toggleshiftstate = false;
+    public static boolean recursion = false;
+    public static boolean slotclick = false;
+
+    public static double timestart = 0;
+    public static boolean timeextension = false;
+    public static boolean resetclose = false;
+
+    Identifier bladder = Identifier.of(Clutch.MOD_ID, "textures/bladder.png");
+    Identifier bladder0 = Identifier.of(Clutch.MOD_ID, "textures/bladder0.png");
+    Identifier bladder1 = Identifier.of(Clutch.MOD_ID, "textures/bladder1.png");
+    Identifier bladder2 = Identifier.of(Clutch.MOD_ID, "textures/bladder2.png");
+    Identifier bladder3 = Identifier.of(Clutch.MOD_ID, "textures/bladder3.png");
+    Identifier bladder4 = Identifier.of(Clutch.MOD_ID, "textures/bladder4.png");
+
+    Identifier boat = Identifier.of(Clutch.MOD_ID, "textures/boat.png");
+    Identifier boat0 = Identifier.of(Clutch.MOD_ID, "textures/boat0.png");
+    Identifier boat1 = Identifier.of(Clutch.MOD_ID, "textures/boat1.png");
+    Identifier boat2 = Identifier.of(Clutch.MOD_ID, "textures/boat2.png");
+    Identifier boat3 = Identifier.of(Clutch.MOD_ID, "textures/boat3.png");
+    Identifier boat4 = Identifier.of(Clutch.MOD_ID, "textures/boat4.png");
+    Identifier arrow = Identifier.of(Clutch.MOD_ID, "textures/arrow.png");
+
+    private boolean isKeyPressed(int key) {
+        return GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), key) == GLFW.GLFW_PRESS;
+    }
+
+    public static double calculateAverage(List<Double> doubleList) {
+        if (doubleList.isEmpty()) {
+            throw new IllegalArgumentException("List is empty, cannot calculate average.");
+        }
+
+        double sum = 0;
+        for (double num : doubleList) {
+            sum += num;
+        }
+
+        return sum / doubleList.size();
+    }
+
+    public static double thresholdTest(List<Double> doubleList) {
+        if (doubleList.isEmpty()) {
+            throw new IllegalArgumentException("List is empty, cannot calculate average.");
+        }
+        double flag = 0;
+        for (double num : doubleList) {
+            if (num > 50)
+                flag++;
+        }
+        return flag;
+    }
+
+    public static final Identifier CLOSE_GUI_PACKET_ID = Identifier.of(Clutch.MOD_ID, "close_gui");
+    public static final Identifier PY_PACKET_ID = Identifier.of(Clutch.MOD_ID, "player_y");
+
+    public static boolean clickedThisTick = false;
+    public static boolean queueNextClick = false;
+    public static boolean queueNextClick2 = false;
+
     @Override
     public void onInitializeClient() {
+        MinecraftClient mc = MinecraftClient.getInstance();
 
+        keyinputhandler.register();
+
+        HandledScreens.register(Clutch.CUSTOM_SCREEN_HANDLER, CustomStorageScreen::new);
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            clickedThisTick = false;
+
+            if (client.player != null && client.currentScreen == null && GlobalDataHandler.getInputBuffering()) {
+                if (queueNextClick2) {
+                    queueNextClick2 = false;
+                    HitResult crosshairTarget = client.crosshairTarget;
+                    Hand hand = Hand.MAIN_HAND;
+
+                    if (crosshairTarget != null && crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                        BlockHitResult blockHit = (BlockHitResult) crosshairTarget;
+
+                        ActionResult placeresult = client.interactionManager.interactBlock(client.player, hand, blockHit);
+
+                        if (placeresult != ActionResult.SUCCESS) {
+                            ActionResult useresult = client.interactionManager.interactItem(client.player, hand);
+
+                            if (useresult != ActionResult.SUCCESS) {
+                                Hand hand2 = Hand.OFF_HAND;
+                                ActionResult placeresult2 = client.interactionManager.interactBlock(client.player, hand2, blockHit);
+
+                                if (placeresult2 != ActionResult.SUCCESS) {
+                                    client.interactionManager.interactItem(client.player, hand2);
+                                }
+
+                            }
+                        }
+                    } else {
+                        ActionResult useresult = client.interactionManager.interactItem(client.player, hand);
+
+                        if (useresult != ActionResult.SUCCESS) {
+                            Hand hand2 = Hand.OFF_HAND;
+                            client.interactionManager.interactItem(client.player, hand2);
+                        }
+                    }
+                }
+
+                if (queueNextClick) {
+                    queueNextClick = false;
+                    queueNextClick2 = true;
+                    clickedThisTick = true;
+                }
+            }
+
+
+        });
+
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            PlayerEntity p = mc.player;
+
+            ClientPlayerEntity player = client.player;
+            if (player == null || client.interactionManager == null) { return; }
+
+
+            if (p != null && MinecraftClient.getInstance().isIntegratedServerRunning() && MinecraftClient.getInstance().getServer() != null) {
+                //SLOT CHANGE
+                if (updateslot >= 0){
+                    p.getInventory().selectedSlot = updateslot;
+                    MinecraftClient.getInstance().getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(updateslot));
+                    updateslot = -1;
+                }
+
+                //p.sendMessage(Text.literal(mc.mouse.getX() + " / " + mc.mouse.getY()));
+
+                //STALL
+                if (Clutch.canParseDouble(new DecimalFormat("#.####").format(p.getY()))){
+                    Clutch.currenty = Double.parseDouble(new DecimalFormat("#.####").format(p.getY()));
+                }
+
+                //ATTEMPT COUNTER
+                overplate = false;
+                BlockPos platepos = new BlockPos(0,0,0);
+                for (int x = 0; x < 1; x++){
+                    for (int z = 0; z < 1; z++){
+                        double xcoord = p.getX()+0.6*x - 0.3 + (2*x-1)*0.0625;
+                        double zcoord = p.getZ()+0.6*x - 0.3 + (2*z-1)*0.0625;
+                        BlockPos hitboxpos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+                        if (mc.world.getBlockState(hitboxpos).getBlock().getName().toString().contains("pressure_plate")){
+                            if (mc.world.getBlockState(hitboxpos.down().north()).getBlock().getName().toString().contains("crafting_table") ||
+                                    mc.world.getBlockState(hitboxpos.down().east()).getBlock().getName().toString().contains("crafting_table") ||
+                                    mc.world.getBlockState(hitboxpos.down().south()).getBlock().getName().toString().contains("crafting_table") ||
+                                    mc.world.getBlockState(hitboxpos.down().west()).getBlock().getName().toString().contains("crafting_table")){
+                                overplate = true;
+                                platepos = new BlockPos((int)Math.floor(xcoord), (int)Math.floor(p.getY()), (int)Math.floor(zcoord));
+                            }
+                        }
+                    }
+                }
+                if (lastoverplate != overplate && overplate){
+                    if (client.isIntegratedServerRunning() && client.getServer() != null) {
+                        StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+                        String pta = serverState.platformattempts;
+                        if (pta == ""){
+                            serverState.platformattempts = "(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") 1 | ";
+                        } else if (pta.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") ")){
+                            String[] allattempts = pta.split(" \\| ");
+                            int index = 0;
+                            String newplatformattempts = "";
+                            for (String attempts : allattempts){
+                                if (attempts.contains("(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ())){
+                                    int attemptcount = Integer.parseInt(attempts.split(" ")[attempts.split(" ").length-1]) + 1;
+                                    String newString = "";
+                                    int index2 = 0;
+                                    for (String str : attempts.split(" ")){
+                                        if (index2 != attempts.split(" ").length-1){
+                                            newString += str + " ";
+                                        }
+                                        index2++;
+                                    }
+                                    newString += attemptcount + " | ";
+                                    newplatformattempts = newplatformattempts + newString;
+
+                                } else {
+                                    newplatformattempts = newplatformattempts + attempts + " | ";
+                                }
+
+                            }
+                            serverState.platformattempts = newplatformattempts;
+                        } else {
+                            serverState.platformattempts = pta + "(" + platepos.getX() + ", " + platepos.getY() + ", " + platepos.getZ() + ") 1 | ";
+                        }
+                    }
+                }
+                lastoverplate = overplate;
+
+
+                //GUI TIME
+                if (MinecraftClient.getInstance().currentScreen instanceof CraftingScreen){
+                    if (tempguitime > 0){
+                        tempguitime -= 1;
+                    }
+                    if (guitime != 0 && tempguitime == 0 && client.currentScreen instanceof CraftingScreen){
+                        double opentime = (System.currentTimeMillis()-timestart);
+                        //p.sendMessage(Text.literal("GUI TIME: " + opentime));
+                        ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+                    }
+                    if (isKeyPressed(InputUtil.fromTranslationKey(client.options.inventoryKey.getBoundKeyTranslationKey()).getCode()) || isKeyPressed(GLFW.GLFW_KEY_ESCAPE)){
+                        if (guitime != 0){
+                            ClientPlayNetworking.send(new CloseGUIPayload(new BlockPos(0,0,0)));
+                            tempguitime = guitime;
+                        }
+                    }
+                }
+
+                //INDICATOR
+                double currentTime = System.currentTimeMillis();
+                if (lastTickTime != 0) {
+                    if (tickavg != null){
+                        double tickDuration = currentTime - lastTickTime;
+                        if (!(tickavg.size() < 10)) {
+                            tickavg.remove(0);
+                        }
+                        tickavg.add(tickDuration);
+                        if (calculateAverage(tickavg) >= 54 && thresholdTest(tickavg) > 4){
+                            isTPS = true;
+                        } else {
+                            isTPS = false;
+                        }
+                    }
+                }
+                lastTickTime = currentTime;
+
+
+
+                //AUTO MOVEMENT
+                if (client.isIntegratedServerRunning() && client.getServer() != null){
+                    StateSaverAndLoader serverState = StateSaverAndLoader.getServerState(client.getServer());
+                    if (GlobalDataHandler.getAutomov() && !serverState.platformcoords.equals("unset")){
+                        if (automovementcountdown > 0){
+                            if (automovementcountdown <= 11){
+                                if (automovementcountdown == 11){
+                                    client.player.setVelocity(0,0,0);
+                                    String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
+                                    client.getNetworkHandler().sendChatCommand(cmd);
+                                    client.options.jumpKey.setPressed(false);
+                                }
+                                if (client.currentScreen == null) {
+                                    client.options.backKey.setPressed(true);
+                                }
+                                if (automovementcountdown == 2){
+                                    client.options.backKey.setPressed(false);
+                                    if (client.currentScreen == null){
+
+                                        client.options.jumpKey.setPressed(true);
+                                    }
+                                }
+                                if (automovementcountdown == 1) {
+                                    client.options.jumpKey.setPressed(false);
+                                    client.options.backKey.setPressed(false);
+                                }
+                            }
+                            automovementcountdown--;
+                        }
+                    }
+                }
+
+                //INPUT LOC
+                if (client.currentScreen == null){
+                    cxcoords = new ArrayList<>();
+                    cycoords = new ArrayList<>();
+                }
+
+            }
+
+            clock++;
+            if (clock==7){
+                clock=0;
+
+                if (showclutch) {
+
+                    Integer groundY = Clutch.getBlockPosPlayerIsLookingAt(mc.player, mc.world, 300.0) + 1;
+
+                    double y = p.getY();
+                    if (Math.floor(y) - groundY > 4) {
+                        double v = p.getVelocity().getY();
+                        double ry = y - groundY; //relative y
+                        double py = 0; //peak y
+                        double sy = 0; //second last y
+                        double ly = 0; //last y
+
+                        while (ry > 3.23) {
+                            ry += v;
+                            v = 0.98 * (v - 0.08);
+                            py = ry;
+                            ly = py;
+                        }
+                        Integer t = 0;
+                        while (ry > 0) {
+                            if (ry > 0) {
+                                t += 1;
+                                sy = ly;
+                                ly = ry;
+                            }
+
+                            ry += v;
+                            v = 0.98 * (v - 0.08);
+                            if (Math.abs(v) < 0.003){v=0;}
+
+                        }
+
+                        boatv = 0;
+                        boatcrouch = false;
+                        if (t >= 3) {
+                            if (ly < 0.5625) {
+                                boatv = 3;
+                            } else {
+                                boatv = 2;
+                            }
+                        } else {
+                            if (t == 2) {
+                                if (ly < 0.5625) {
+                                    boatv = 4;
+                                } else {
+                                    boatv = 1;
+                                }
+                                if (py > 2.88 && boatv >= 1 && boatv <= 4){boatcrouch = true;}
+                                else{ boatcrouch = false;}
+                            }
+                        }
+
+                        bladderv = 4;
+                        bladdercrouch = false;
+                        if (t >= 2) {
+                            bladderv = 4;
+                            if (sy > 2.25) {
+                                bladderv = 3;
+                            }
+                            if (sy > 2.75) {
+                                bladderv = 2;
+                            }
+                            if (sy > 3) {
+                                bladderv = 1;
+                            }
+                            if (sy > 3.203430557) {
+                                bladderv = 0;
+                            }
+                            if (sy > 2.8532 && bladderv >= 1 && bladderv <= 4){
+                                bladdercrouch = true;
+                            } else{ bladdercrouch = false;}
+                        } else {
+                            bladderv = 0;
+                        }
+
+                        hayv=0;
+                        if (ly>0.9375){
+                            hayv=1;
+                            if (ly>1){
+                                hayv=2;
+                                if (py<2.88){
+                                    hayv=3;
+                                }
+                            }
+                        }
+
+                    } else {
+                        boatv = 5;
+                        bladderv = 5;
+                        hayv = 4;
+                    }
+                }
+            }
+        });
+
+
+        ScreenEvents.AFTER_INIT.register((MinecraftClient client, Screen screen, int w, int h) -> {
+            if ((screen instanceof CraftingScreen || (screen instanceof InventoryScreen && !client.player.isInCreativeMode())) && GlobalDataHandler.getRecipe() > 0){
+                for (Element element : screen.children()) {
+                    if (GlobalDataHandler.getRecipe() > 1 && element instanceof ButtonWidget button){
+                        button.visible = false;
+                    }
+                    screen.children().remove(element);
+                }
+            }
+        });
+
+        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+            if (showclutch){
+                TextRenderer textRenderer = mc.textRenderer;
+                drawContext.drawTexture(bladder, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
+                drawContext.drawTexture(boat, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);
+
+                int bladdertot = 0;
+                int boattot = 0;
+
+                if (bladderv == 0){drawContext.drawTexture(bladder0, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+                if (bladderv == 1){drawContext.drawTexture(bladder1, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+                if (bladderv == 2){drawContext.drawTexture(bladder2, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+                if (bladderv == 3){drawContext.drawTexture(bladder3, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+                if (bladderv == 4){drawContext.drawTexture(bladder4, 4, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);bladdertot++;}
+
+                if (boatv == 0){drawContext.drawTexture(boat0, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+                if (boatv == 1){drawContext.drawTexture(boat1, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+                if (boatv == 2){drawContext.drawTexture(boat2, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+                if (boatv == 3){drawContext.drawTexture(boat3, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+                if (boatv == 4){drawContext.drawTexture(boat4, 31, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);boattot++;}
+
+
+                if (bladdercrouch && bladdertot>=1){drawContext.drawTexture(arrow, 10, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
+                if (boatcrouch && boattot>=1){drawContext.drawTexture(arrow, 40, mc.getWindow().getScaledHeight()-25, 0, 0, 24, 24, 24, 24);}
+            }
+        });
     }
 }
