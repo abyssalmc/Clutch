@@ -21,6 +21,20 @@ public class StorageBlock extends Block implements BlockEntityProvider {
         return new CustomStorageBlockEntity(pos, state);
     }
 
+    // redstone power
+    @Override
+    protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
+
+        if (!world.isClient) {
+            boolean isPowered = world.isReceivingRedstonePower(pos);
+            BlockEntity be = world.getBlockEntity(pos);
+            if (be instanceof CustomStorageBlockEntity storageBE) {
+                storageBE.onRedstoneUpdate(isPowered);
+            }
+        }
+    }
+
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (!world.isClient) {

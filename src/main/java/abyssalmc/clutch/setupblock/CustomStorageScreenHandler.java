@@ -38,10 +38,11 @@ public class CustomStorageScreenHandler extends ScreenHandler {
         // armor row
         List<Identifier> textures = new ArrayList<>(Arrays.asList(PlayerScreenHandler.EMPTY_OFFHAND_ARMOR_SLOT, PlayerScreenHandler.EMPTY_HELMET_SLOT_TEXTURE, PlayerScreenHandler.EMPTY_CHESTPLATE_SLOT_TEXTURE, PlayerScreenHandler.EMPTY_LEGGINGS_SLOT_TEXTURE, PlayerScreenHandler.EMPTY_BOOTS_SLOT_TEXTURE));
         for (int x = 0; x < 5; x++) {
+            Identifier slotTexture = textures.get(x);
             this.addSlot(new Slot(inventory, index++, 8 + x * 18, 18) {
                 @Override
                 public @Nullable Pair<Identifier, Identifier> getBackgroundSprite() {
-                    return Pair.of(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, textures.get(x));
+                    return Pair.of(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, slotTexture);
                 }
             });
         }

@@ -34,6 +34,56 @@ public class CustomStorageBlockEntity extends BlockEntity implements bInventory,
         return Text.literal("Setup Block");
     }
 
+    private boolean wasPowered = false;
+
+    public void onRedstoneUpdate(boolean isPowered) {
+        if (isPowered && !this.wasPowered) {
+            overridePlayerInventory();
+        }
+        this.wasPowered = isPowered;
+    }
+
+    private void overridePlayerInventory() {
+        if (this.world == null || this.world.isClient) return;
+
+        PlayerEntity player = this.world.getClosestPlayer(
+                this.pos.getX() + 0.5,
+                this.pos.getY() + 0.5,
+                this.pos.getZ() + 0.5,
+                5.0,
+                false
+        );
+
+        if (player == null) return;
+
+        PlayerInventory playerInv = player.getInventory();
+
+        // override armor
+        overrideStack(0, playerInv.offHand, 0);
+        overrideStack(1, playerInv.armor, 3);
+        overrideStack(2, playerInv.armor, 2);
+        overrideStack(3, playerInv.armor, 1);
+        overrideStack(4, playerInv.armor, 0);
+
+        // override inv
+        for (int i = 0; i < 27; i++) {
+            overrideStack(5 + i, playerInv.main, 9 + i);
+        }
+
+        // override hotbar
+        for (int i = 0; i < 9; i++) {
+            overrideStack(33 + i, playerInv.main, i);
+        }
+
+        playerInv.markDirty();
+        player.currentScreenHandler.sendContentUpdates();
+    }
+
+    private void overrideStack(int blockSlot, DefaultedList<ItemStack> playerList, int playerIndex) {
+        ItemStack blockStack = this.getStack(blockSlot);
+        playerList.set(playerIndex, blockStack.copy());
+    }
+
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         return new CustomStorageScreenHandler(syncId, playerInventory, this);
