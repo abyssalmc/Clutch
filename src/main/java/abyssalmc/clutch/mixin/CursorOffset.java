@@ -29,32 +29,18 @@ public class CursorOffset {
 
     @Inject(method = "unlockCursor", at = @At("TAIL"), cancellable = true)
     private void unlockPos(CallbackInfo ci) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof InventoryScreen){
-            if (offsetEnabled){
-                this.x = cursorx;
-                this.y = cursory;
-                InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
-                client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
-                offsetEnabled = false;
-                ci.cancel();
-            }
-        } else {
-            if (offsetEnabled){
-                offsetEnabled = false;
-                ci.cancel();
-            }
-        }
-    }
+        if (!offsetEnabled) return;
 
-    @Inject(method = "lockCursor", at = @At("TAIL"), cancellable = true)
-    private void lockPos(CallbackInfo ci) {
-        if (offsetEnabled){
-            MinecraftClient client = MinecraftClient.getInstance();
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.currentScreen instanceof CraftingScreen || client.currentScreen instanceof InventoryScreen) {
             this.x = cursorx;
             this.y = cursory;
-            InputUtil.setCursorParameters(client.getWindow().getHandle(), 212995, this.x, this.y);
+
+            InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y);
             client.execute(() -> InputUtil.setCursorParameters(client.getWindow().getHandle(), 212993, this.x, this.y));
+
+            offsetEnabled = false;
+            ci.cancel();
         }
     }
 }

@@ -1,7 +1,7 @@
 package abyssalmc.clutch;
 
 import abyssalmc.clutch.event.keyinputhandler;
-import abyssalmc.clutch.setupblock.CustomStorageScreen;
+import abyssalmc.clutch.setupblock.SetupBlockScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -134,7 +134,7 @@ public class ClutchClient implements ClientModInitializer {
 
         keyinputhandler.register();
 
-        HandledScreens.register(Clutch.CUSTOM_SCREEN_HANDLER, CustomStorageScreen::new);
+        HandledScreens.register(Clutch.SETUP_BLOCK_SCREEN_HANDLER, SetupBlockScreen::new);
 
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             clickedThisTick = false;
@@ -309,8 +309,6 @@ public class ClutchClient implements ClientModInitializer {
                             if (automovementcountdown <= 11){
                                 if (automovementcountdown == 11){
                                     client.player.setVelocity(0,0,0);
-                                    String cmd = "tp @s " + serverState.platformcoords + GlobalDataHandler.getPitch();
-                                    client.getNetworkHandler().sendChatCommand(cmd);
                                     client.options.jumpKey.setPressed(false);
                                 }
                                 if (client.currentScreen == null) {

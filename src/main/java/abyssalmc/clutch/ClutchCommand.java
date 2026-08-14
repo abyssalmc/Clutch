@@ -284,6 +284,7 @@ public class ClutchCommand {
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerEntity p = mc.player;
 
+
         offsetEnabled = true;
         cursorx = IntegerArgumentType.getInteger(context, "cursorX");
         cursory = IntegerArgumentType.getInteger(context, "cursorY");

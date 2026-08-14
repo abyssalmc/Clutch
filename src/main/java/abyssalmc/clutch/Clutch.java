@@ -1,7 +1,7 @@
 package abyssalmc.clutch;
 
-import abyssalmc.clutch.setupblock.CustomStorageBlockEntity;
-import abyssalmc.clutch.setupblock.StorageBlock;
+import abyssalmc.clutch.setupblock.SetupBlockEntity;
+import abyssalmc.clutch.setupblock.SetupBlock;
 import abyssalmc.clutch.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 
@@ -20,10 +20,11 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -78,10 +79,14 @@ public class Clutch implements ModInitializer {
 	}
 
 
-	public static Block CUSTOM_BLOCK;
-	public static BlockEntityType<CustomStorageBlockEntity> CUSTOM_BLOCK_ENTITY;
-	public static ScreenHandlerType<abyssalmc.clutch.setupblock.CustomStorageScreenHandler> CUSTOM_SCREEN_HANDLER;
-	public static Item CUSTOM_BLOCK_ITEM;
+	public static Block SETUP_BLOCK;
+	public static BlockEntityType<SetupBlockEntity> SETUP_BLOCK_ENTITY;
+	public static final ScreenHandlerType<SetupBlockScreenHandler> SETUP_BLOCK_SCREEN_HANDLER = Registry.register(
+			Registries.SCREEN_HANDLER,
+			Identifier.of(MOD_ID, "setup_block_screen"),
+			new ExtendedScreenHandlerType<>(SetupBlockScreenHandler::new, TextStoragePayload.CODEC)
+	);
+	public static Item SETUP_BLOCK_ITEM;
 
 	@Override
 	public void onInitialize() {
@@ -111,6 +116,28 @@ public class Clutch implements ModInitializer {
 			});
 		});
 
+		PayloadTypeRegistry.playC2S().register(PasteInventoryPayload.ID, PasteInventoryPayload.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(PasteInventoryPayload.ID, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayerEntity player = context.player();
+				if (player.getWorld().getBlockEntity(payload.pos()) instanceof SetupBlockEntity storageBE) {
+					storageBE.pasteFromPlayer(player);
+				}
+			});
+		});
+
+		PayloadTypeRegistry.playC2S().register(UpdateFieldsPayload.ID, UpdateFieldsPayload.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(UpdateFieldsPayload.ID, (payload, context) -> {
+			context.server().execute(() -> {
+				ServerPlayerEntity player = context.player();
+				if (player.getWorld().getBlockEntity(payload.pos()) instanceof SetupBlockEntity storageBE) {
+					storageBE.setFields(payload.slotText(), payload.offsetText());
+				}
+			});
+		});
+
 		ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
 			if (GlobalDataHandler.getStalls()){
 				if (entity instanceof PlayerEntity && source.getType().toString().contains("deathMessageType=FALL_VARIANTS]")) {
@@ -132,28 +159,20 @@ public class Clutch implements ModInitializer {
 		});
 
 		// setup block
-		CUSTOM_BLOCK = Registry.register(
+		SETUP_BLOCK = Registry.register(
 				Registries.BLOCK,
 				Identifier.of(MOD_ID, "setup_block"),
-				new StorageBlock(AbstractBlock.Settings.create())
+				new SetupBlock(AbstractBlock.Settings.create())
 		);
-		CUSTOM_BLOCK_ENTITY = Registry.register(
+		SETUP_BLOCK_ENTITY = Registry.register(
 				Registries.BLOCK_ENTITY_TYPE,
 				Identifier.of(MOD_ID, "setup_be"),
-				BlockEntityType.Builder.create(CustomStorageBlockEntity::new, CUSTOM_BLOCK).build()
+				BlockEntityType.Builder.create(SetupBlockEntity::new, SETUP_BLOCK).build()
 		);
-		CUSTOM_SCREEN_HANDLER = Registry.register(
-				Registries.SCREEN_HANDLER,
-				Identifier.of(MOD_ID, "custom_screen"),
-				new ExtendedScreenHandlerType<>((syncId, playerInventory, pos) ->
-						new CustomStorageScreenHandler(syncId, playerInventory, pos),
-						BlockPos.PACKET_CODEC
-				)
-		);
-		CUSTOM_BLOCK_ITEM = Registry.register(
+		SETUP_BLOCK_ITEM = Registry.register(
 				Registries.ITEM,
-				Identifier.of(MOD_ID, "custom_storage_block"),
-				new BlockItem(CUSTOM_BLOCK, new Item.Settings())
+				Identifier.of(MOD_ID, "setup_block"),
+				new BlockItem(SETUP_BLOCK, new Item.Settings().rarity(Rarity.EPIC))
 		);
 	}
 }

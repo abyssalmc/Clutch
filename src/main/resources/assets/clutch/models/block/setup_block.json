@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_command_block",
+  "textures": {
+    "front": "clutch:block/setup_block_front",
+    "back": "clutch:block/setup_block_back",
+    "side": "clutch:block/setup_block_side"
+  }
+}

@@ -7,7 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
-public interface bInventory extends SidedInventory {
+// BLOCK INVENTORY (basic handling)
+
+public interface SetupBlockInventory extends SidedInventory {
     DefaultedList<ItemStack> getItems();
 
     @Override

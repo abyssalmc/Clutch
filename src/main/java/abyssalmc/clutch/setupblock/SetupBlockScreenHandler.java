@@ -7,10 +7,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -19,16 +19,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CustomStorageScreenHandler extends ScreenHandler {
+// SCREEN HANDLER (slot locations, special slots and actions)
+
+public class SetupBlockScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
+    private final Inventory deleteInventory = new SimpleInventory(1);
 
-    public CustomStorageScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos pos) {
-        this(syncId, playerInventory, new SimpleInventory(51));
+    private BlockPos pos;
+    private String slotText = "";
+    private String offsetText = "";
+
+    public String getSlotText() { return this.slotText; }
+    public String getOffsetText() { return this.offsetText; }
+
+    public static class TrashSlot extends Slot {
+        public TrashSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+        }
+
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return false;
+        }
     }
 
-    public CustomStorageScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
-        super(Clutch.CUSTOM_SCREEN_HANDLER, syncId);
+    public SetupBlockScreenHandler(int syncId, PlayerInventory playerInventory, TextStoragePayload data) {
+        this(syncId, playerInventory, new SimpleInventory(51));
+        this.pos = data.pos();
+        this.slotText = data.slotText();
+        this.offsetText = data.offsetText();
+    }
+
+
+    public SetupBlockScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+        super(Clutch.SETUP_BLOCK_SCREEN_HANDLER, syncId);
         checkSize(inventory, 51);
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
@@ -70,11 +95,19 @@ public class CustomStorageScreenHandler extends ScreenHandler {
         for (int x = 0; x < 9; x++) {
             this.addSlot(new Slot(playerInventory, x, 8 + x * 18, 198));
         }
+
+        // delete slot
+        this.addSlot(new TrashSlot(this.deleteInventory, 0, 152, 18));
     }
+
 
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.inventory.canPlayerUse(player);
+    }
+
+    public BlockPos getPos() {
+        return this.pos;
     }
 
     @Override
@@ -100,5 +133,31 @@ public class CustomStorageScreenHandler extends ScreenHandler {
             }
         }
         return newStack;
+    }
+
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        if (slotIndex >= 0 && slotIndex < this.slots.size()) {
+            Slot slot = this.slots.get(slotIndex);
+
+            if (slot instanceof TrashSlot) {
+
+                if (actionType == SlotActionType.QUICK_MOVE) {
+                    for (int i = 0; i < this.inventory.size(); i++) {
+                        this.inventory.setStack(i, ItemStack.EMPTY);
+                    }
+                    this.inventory.markDirty();
+                    this.sendContentUpdates();
+                    return;
+                }
+
+                if (actionType == SlotActionType.PICKUP || actionType == SlotActionType.PICKUP_ALL) {
+                    this.setCursorStack(ItemStack.EMPTY);
+                    return;
+                }
+            }
+        }
+
+        super.onSlotClick(slotIndex, button, actionType, player);
     }
 }
